@@ -1,0 +1,9 @@
+{
+	"folders": [
+		{ "path": "../" }
+	],
+	"settings": {
+		"dotnet.defaultSolution": "${workspaceFolder}/src/Flow.slnx",
+		"terminal.integrated.cwd": "${workspaceFolder}/src"
+	}
+}

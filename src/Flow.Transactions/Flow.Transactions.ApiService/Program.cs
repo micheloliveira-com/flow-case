@@ -41,6 +41,8 @@ builder.Services.AddAuthorizationBuilder()
 builder.AddRabbitMQClient("rabbitmq");
 builder.Services.AddHostedService<TransactionDailyRecomputeWorker>();
 
+builder.Services.AddScoped<ICreateTransactionService, CreateTransactionService>();
+
 var app = builder.Build();
 
 await using var scope = app.Services.CreateAsyncScope();
@@ -60,38 +62,11 @@ app.UseAuthorization();
 
 app.MapGet("/", () => "Transactions API is running.");
 
-app.MapPost("/transactions", async (TransactionDbContext db, Transaction input, IConnection connection) =>
+app.MapPost("/transactions", async (
+    CreateTransactionRequest request,
+    ICreateTransactionService service) =>
 {
-    var tx = new Transaction
-    {
-        Id = Guid.NewGuid(),
-        Amount = input.Amount,
-        Type = input.Type,
-        Date = input.Date,
-        Description = input.Description
-    };
-
-    db.Transactions.Add(tx);
-
-    await db.SaveChangesAsync();
-
-    using var channel = await connection.CreateChannelAsync();
-
-    await channel.QueueDeclareAsync(
-        queue: "transaction-daily-recompute",
-        durable: true,
-        exclusive: false,
-        autoDelete: false);
-
-    await channel.BasicPublishAsync(
-        exchange: "",
-        routingKey: "transaction-daily-recompute",
-        mandatory: false,
-        basicProperties: new BasicProperties(),
-        body: System.Text.Json.JsonSerializer.SerializeToUtf8Bytes(new
-        {
-            Date = input.Date
-        }));
+    var tx = await service.ExecuteAsync(request);
 
     return Results.Created($"/transactions/{tx.Id}", tx);
 });
@@ -121,14 +96,20 @@ app.MapPut("/transactions/{id:guid}", async (TransactionDbContext db, Guid id, T
 
     var oldDate = tx.Date;
 
-    tx.Amount = input.Amount;
-    tx.Type = input.Type;
-    tx.Date = input.Date;
-    tx.Description = input.Description;
+    var updated = new Transaction(
+        id: id,
+        amount: input.Amount,
+        type: input.Type,
+        date: input.Date,
+        description: input.Description
+    );
+
+    db.Entry(tx).CurrentValues.SetValues(updated);
 
     await db.SaveChangesAsync();
 
     using var channel = await connection.CreateChannelAsync();
+
     await channel.QueueDeclareAsync(
         queue: "transaction-daily-recompute",
         durable: true,
@@ -153,6 +134,7 @@ app.MapPut("/transactions/{id:guid}", async (TransactionDbContext db, Guid id, T
                 Date = date
             }));
     }
+
     return Results.Ok(tx);
 });
 
