@@ -1,0 +1,13 @@
+<Solution>
+  <Project Path="Flow.Aspire/Flow.Aspire.AppHost/Flow.Aspire.AppHost.csproj" />
+  <Project Path="Flow.Aspire/Flow.Aspire.ServiceDefaults/Flow.Aspire.ServiceDefaults.csproj" />
+  <Project Path="Flow.Reports/Flow.Reports.ApiService/Flow.Reports.ApiService.csproj" />
+  <Project Path="Flow.Reports/Flow.Reports.Application/Flow.Reports.Application.csproj" />
+  <Project Path="Flow.Reports/Flow.Reports.Infrastructure/Flow.Reports.Infrastructure.csproj" />
+  <Project Path="Flow.Reports/Flow.Reports.Domain/Flow.Reports.Domain.csproj" />
+  <Project Path="Flow.Transactions/Flow.Transactions.ApiService/Flow.Transactions.ApiService.csproj" />
+  <Project Path="Flow.Transactions/Flow.Transactions.Application/Flow.Transactions.Application.csproj" />
+  <Project Path="Flow.Transactions/Flow.Transactions.Domain/Flow.Transactions.Domain.csproj" />
+  <Project Path="Flow.Transactions/Flow.Transactions.Infrastructure/Flow.Transactions.Infrastructure.csproj" />
+  <Project Path="Flow.Web/Flow.Web.Blazor/Flow.Web.Blazor.csproj" />
+</Solution>

@@ -1,0 +1,30 @@
+@page "/Account/AccessDenied"
+@using Microsoft.AspNetCore.Components
+@inject NavigationManager Navigation
+
+<PageTitle>Access Denied</PageTitle>
+
+<div class="row justify-content-center">
+    <div class="col-12 col-md-8 col-lg-6">
+        <div class="card shadow-sm mt-5 border-danger">
+            <div class="card-body text-center">
+                <div class="mb-3">
+                    <span class="display-3 text-danger">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" fill="currentColor" class="bi bi-shield-lock-fill" viewBox="0 0 16 16">
+                            <path d="M8 0c-.69 0-1.37.07-2.05.21C3.07.58 1.5 2.1 1.5 4.09v3.6c0 4.42 3.4 7.13 6.13 8.23.23.09.49.09.72 0C11.1 14.82 14.5 12.11 14.5 7.69v-3.6c0-1.99-1.57-3.51-4.45-3.88A9.77 9.77 0 0 0 8 0zm0 1.07c.6 0 1.19.06 1.77.18C12.43 1.5 13.5 2.7 13.5 4.09v3.6c0 3.98-2.97 6.36-5.5 7.36-2.53-1-5.5-3.38-5.5-7.36v-3.6c0-1.39 1.07-2.59 3.73-2.84.58-.12 1.17-.18 1.77-.18z"/>
+                            <path d="M8 5a2 2 0 0 0-2 2v1a2 2 0 0 0 1 1.73V11a1 1 0 0 0 2 0V9.73A2 2 0 0 0 10 8V7a2 2 0 0 0-2-2zm0 1a1 1 0 0 1 1 1v1a1 1 0 0 1-2 0V7a1 1 0 0 1 1-1z"/>
+                        </svg>
+                    </span>
+                </div>
+                <h2 class="card-title text-danger mb-3">Access Denied</h2>
+                <p class="lead">You do not have permission to access this page.</p>
+                <p class="mb-3">If you believe this is an error, please contact your administrator.</p>
+                <button class="btn btn-outline-primary" @onclick="GoHome">Go to Home</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+@code {
+    private void GoHome() => Navigation.NavigateTo("/");
+}

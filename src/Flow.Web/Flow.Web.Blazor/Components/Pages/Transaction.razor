@@ -1,0 +1,320 @@
+﻿@page "/transaction"
+@rendermode InteractiveServer
+
+@inject TransactionApiClient TransactionsApi
+@inject IJSRuntime JS
+
+<h3 class="mb-4">Transactions</h3>
+
+@if (!string.IsNullOrEmpty(errorMessage))
+{
+    <div class="alert alert-danger">@errorMessage</div>
+}
+
+@if (isLoading)
+{
+    <p><em>Loading...</em></p>
+}
+else
+{
+    <div class="card shadow-sm">
+        <div class="card-body">
+
+            <div class="mb-3">
+
+                <div class="d-flex justify-content-between align-items-center">
+                    <h5 class="mb-0">Transaction list</h5>
+
+                    <button class="btn btn-success btn-sm" @onclick="OpenCreate">
+                        + Add transaction
+                    </button>
+                </div>
+
+                <div class="d-flex gap-2 mt-3">
+                    <input class="form-control form-control-sm"
+                           style="max-width: 180px;"
+                           type="date"
+                           @bind="filterStart"
+                           @bind:format="yyyy-MM-dd"
+                           @bind:after="Load" />
+
+                    <input class="form-control form-control-sm"
+                           style="max-width: 180px;"
+                           type="date"
+                           @bind="filterEnd"
+                           @bind:format="yyyy-MM-dd"
+                           @bind:after="Load" />
+                </div>
+
+            </div>
+
+            <div class="table-responsive">
+                <table class="table table-hover align-middle">
+                    <thead class="table-light">
+                        <tr>
+                            <th>Date</th>
+                            <th>Type</th>
+                            <th>Amount</th>
+                            <th>Description</th>
+                            <th class="text-end">Actions</th>
+                        </tr>
+                    </thead>
+
+                    <tbody>
+                        @if (transactions?.Any() != true)
+                        {
+                            <tr>
+                                <td colspan="5"><em>No transactions found.</em></td>
+                            </tr>
+                        }
+                        else
+                        {
+                            @foreach (var tx in transactions)
+                            {
+                                <tr class='@(tx.Type == TransactionType.Debit ? "table-danger" : "table-success")'>
+                                    <td>@tx.Date</td>
+                                    <td>@tx.Type</td>
+                                    <td>$@tx.Amount</td>
+                                    <td>@tx.Description</td>
+                                    <td class="text-end">
+                                        <button class="btn btn-sm btn-outline-primary me-2"
+                                                @onclick="() => StartEdit(tx)">
+                                            Edit
+                                        </button>
+
+                                        <button class="btn btn-sm btn-outline-danger"
+                                                @onclick="() => ConfirmDelete(tx.Id)">
+                                            Delete
+                                        </button>
+                                    </td>
+                                </tr>
+                            }
+                        }
+                    </tbody>
+                </table>
+            </div>
+
+        </div>
+    </div>
+}
+
+@if (isModalOpen)
+{
+    <div class="modal fade show d-block"
+         tabindex="-1"
+         style="background-color: rgba(0,0,0,0.5);">
+
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+
+                <div class="modal-header">
+                    <h5 class="modal-title">
+                        @(isEditing ? "Edit transaction" : "New transaction")
+                    </h5>
+
+                    <button type="button"
+                            class="btn-close"
+                            @onclick="CloseModal">
+                    </button>
+                </div>
+
+                <div class="modal-body">
+
+                    <div class="mb-3">
+                        <label class="form-label">Amount</label>
+                        <input class="form-control"
+                               type="number"
+                               @bind="formModel.Amount" />
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label">Type</label>
+                        <select class="form-select"
+                                @bind="formModel.Type">
+                            @foreach (var type in Enum.GetValues<TransactionType>())
+                            {
+                                <option value="@type">@type</option>
+                            }
+                        </select>
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label">Date</label>
+                        <input class="form-control"
+                               type="date"
+                               @bind="formModel.Date"
+                               @bind:format="yyyy-MM-dd" />
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label">Description</label>
+                        <input class="form-control"
+                               type="text"
+                               @bind="formModel.Description" />
+                    </div>
+
+                </div>
+
+                <div class="modal-footer">
+
+                    <button class="btn btn-secondary" @onclick="CloseModal">
+                        Cancel
+                    </button>
+
+                    <button class="btn btn-primary" @onclick="SaveForm">
+                        @(isEditing ? "Save changes" : "Create")
+                    </button>
+
+                </div>
+
+            </div>
+        </div>
+    </div>
+}
+
+@code {
+    private Blazor.Transaction[]? transactions;
+    private bool isLoading = true;
+    private string? errorMessage;
+
+    private bool isModalOpen;
+    private bool isEditing;
+
+    private TransactionEditModel formModel = new();
+
+    private DateOnly? filterStart;
+    private DateOnly? filterEnd;
+
+    protected override async Task OnInitializedAsync()
+    {
+        await Load();
+    }
+
+    private async Task Load()
+    {
+        isLoading = true;
+        errorMessage = null;
+
+        try
+        {
+            transactions = await TransactionsApi.GetTransactionsAsync(filterStart, filterEnd);
+        }
+        catch (Exception ex)
+        {
+            errorMessage = ex.Message;
+        }
+        finally
+        {
+            isLoading = false;
+        }
+    }
+
+    private void OpenCreate()
+    {
+        isModalOpen = true;
+        isEditing = false;
+
+        formModel = new TransactionEditModel
+        {
+            Amount = 0,
+            Type = TransactionType.Credit,
+            Date = DateOnly.FromDateTime(DateTime.Now),
+            Description = string.Empty
+        };
+    }
+
+    private void StartEdit(Blazor.Transaction tx)
+    {
+        isModalOpen = true;
+        isEditing = true;
+
+        formModel = new TransactionEditModel
+        {
+            Id = tx.Id,
+            Amount = tx.Amount,
+            Type = tx.Type,
+            Date = tx.Date,
+            Description = tx.Description
+        };
+    }
+
+    private void CloseModal()
+    {
+        isModalOpen = false;
+        isEditing = false;
+
+        formModel = new TransactionEditModel
+        {
+            Amount = 0,
+            Type = TransactionType.Credit,
+            Date = DateOnly.FromDateTime(DateTime.Now)
+        };
+    }
+
+    private async Task SaveForm()
+    {
+        errorMessage = null;
+
+        try
+        {
+            if (isEditing)
+            {
+                var updated = new Blazor.Transaction(
+                    formModel.Id,
+                    formModel.Amount,
+                    formModel.Type,
+                    formModel.Date,
+                    formModel.Description
+                );
+
+                await TransactionsApi.UpdateAsync(updated.Id, updated);
+            }
+            else
+            {
+                var created = new Blazor.Transaction(
+                    Guid.Empty,
+                    formModel.Amount,
+                    formModel.Type,
+                    formModel.Date,
+                    formModel.Description
+                );
+
+                await TransactionsApi.CreateAsync(created);
+            }
+
+            await Load();
+            CloseModal();
+        }
+        catch (Exception ex)
+        {
+            errorMessage = ex.Message;
+        }
+    }
+
+    private async Task ConfirmDelete(Guid id)
+    {
+        var ok = await JS.InvokeAsync<bool>("confirm",
+            $"Delete transaction {id}?");
+
+        if (!ok) return;
+
+        try
+        {
+            await TransactionsApi.DeleteAsync(id);
+            await Load();
+        }
+        catch (Exception ex)
+        {
+            errorMessage = ex.Message;
+        }
+    }
+
+    private class TransactionEditModel
+    {
+        public Guid Id { get; set; }
+        public decimal Amount { get; set; }
+        public TransactionType Type { get; set; }
+        public DateOnly Date { get; set; }
+        public string? Description { get; set; }
+    }
+}

@@ -1,0 +1,36 @@
+﻿@page "/"
+
+<PageTitle>Home</PageTitle>
+
+<div class="container py-4">
+    <div class="mb-4">
+        <h1 class="display-6 mb-1">Flow</h1>
+        <div class="text-muted">Transaction processing and balance analytics console.</div>
+    </div>
+
+    <div class="row g-3">
+        <div class="col-12 col-md-4">
+            <div class="card h-100 shadow-sm">
+                <div class="card-body d-flex flex-column">
+                    <h5 class="card-title">Transactions</h5>
+                    <p class="card-text">Browse and maintain transaction records.</p>
+                    <div class="mt-auto">
+                        <a class="btn btn-primary w-100" href="/transaction">Open</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-12 col-md-4">
+            <div class="card h-100 shadow-sm">
+                <div class="card-body d-flex flex-column">
+                    <h5 class="card-title">Daily Balance</h5>
+                    <p class="card-text">Review aggregated transactions by day.</p>
+                    <div class="mt-auto">
+                        <a class="btn btn-primary w-100" href="/transaction-daily-balance">Open</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
