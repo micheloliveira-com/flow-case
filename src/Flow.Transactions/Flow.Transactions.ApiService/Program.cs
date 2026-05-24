@@ -45,6 +45,7 @@ builder.Services.AddHostedService<TransactionDailyRecomputeWorker>();
 builder.Services.AddScoped<ICreateTransactionService, CreateTransactionService>();
 builder.Services.AddScoped<IGetTransactionsService, GetTransactionsService>();
 builder.Services.AddScoped<IUpdateTransactionService, UpdateTransactionService>();
+builder.Services.AddScoped<IDeleteTransactionService, DeleteTransactionService>();
 
 var app = builder.Build();
 
@@ -67,26 +68,29 @@ app.MapGet("/", () => "Transactions API is running.");
 
 app.MapPost("/transactions", async (
     CreateTransactionRequest request,
-    ICreateTransactionService service) =>
+    ICreateTransactionService service,
+    CancellationToken cancellationToken) =>
 {
-    var tx = await service.ExecuteAsync(request);
+    var tx = await service.ExecuteAsync(request, cancellationToken);
 
     return Results.Created($"/transactions/{tx.Id}", tx);
 });
 
 app.MapGet("/transactions", async (
     [AsParameters] GetTransactionsRequest request,
-    IGetTransactionsService service) =>
+    IGetTransactionsService service,
+    CancellationToken cancellationToken) =>
 {
-    return await service.ExecuteAsync(request);
+    return await service.ExecuteAsync(request, cancellationToken);
 });
 
 app.MapPut("/transactions/{id:guid}", async (
     Guid id,
     UpdateTransactionRequest request,
-    IUpdateTransactionService service) =>
+    IUpdateTransactionService service,
+    CancellationToken cancellationToken) =>
 {
-    var tx = await service.ExecuteAsync(id, request);
+    var tx = await service.ExecuteAsync(id, request, cancellationToken);
 
     if (tx is null)
         return Results.NotFound();
@@ -94,34 +98,15 @@ app.MapPut("/transactions/{id:guid}", async (
     return Results.Ok(tx);
 });
 
-app.MapDelete("/transactions/{id:guid}", async (TransactionDbContext db, Guid id, IConnection connection) =>
+app.MapDelete("/transactions/{id:guid}", async (
+    [AsParameters] DeleteTransactionRequest request,
+    IDeleteTransactionService service,
+    CancellationToken cancellationToken) =>
 {
-    var tx = await db.Transactions.FirstOrDefaultAsync(x => x.Id == id);
-    if (tx is null) return Results.NotFound();
+    var deleted = await service.ExecuteAsync(request, cancellationToken);
 
-    var date = tx.Date;
-
-    db.Transactions.Remove(tx);
-
-    await db.SaveChangesAsync();
-
-    using var channel = await connection.CreateChannelAsync();
-
-    await channel.QueueDeclareAsync(
-        queue: "transaction-daily-recompute",
-        durable: true,
-        exclusive: false,
-        autoDelete: false);
-
-    await channel.BasicPublishAsync(
-    exchange: "",
-    routingKey: "transaction-daily-recompute",
-    mandatory: false,
-    basicProperties: new BasicProperties(),
-    body: System.Text.Json.JsonSerializer.SerializeToUtf8Bytes(new
-    {
-        Date = date
-    }));
+    if (!deleted)
+        return Results.NotFound();
 
     return Results.NoContent();
 });
