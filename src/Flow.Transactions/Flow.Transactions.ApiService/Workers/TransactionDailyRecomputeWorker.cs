@@ -9,10 +9,10 @@ public sealed class TransactionDailyRecomputeWorker(
     {
         using var scope = scopeFactory.CreateScope();
 
-        var service = scope.ServiceProvider
+        var consumer = scope.ServiceProvider
             .GetRequiredService<ITransactionDailyRecomputeConsumer>();
 
-        await service.StartAsync(
+        await consumer.StartAsync(
             async message =>
             {
                 using var innerScope = scopeFactory.CreateScope();

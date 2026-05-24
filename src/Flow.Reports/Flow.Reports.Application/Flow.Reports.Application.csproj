@@ -7,6 +7,6 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\Flow.Reports.Infrastructure\Flow.Reports.Infrastructure.csproj" />
+    <ProjectReference Include="..\Flow.Reports.Domain\Flow.Reports.Domain.csproj" />
   </ItemGroup>
 </Project>

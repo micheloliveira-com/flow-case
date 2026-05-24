@@ -8,6 +8,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\Flow.Reports.Domain\Flow.Reports.Domain.csproj" />
+    <ProjectReference Include="..\Flow.Reports.Application\Flow.Reports.Application.csproj" />
   </ItemGroup>
 
   <ItemGroup>
