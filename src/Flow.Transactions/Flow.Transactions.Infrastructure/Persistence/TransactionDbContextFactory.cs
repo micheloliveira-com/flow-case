@@ -1,7 +1,8 @@
+using Flow.Transactions.Infrastructure.Persistence;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Design;
 
-namespace Flow.Transactions.Infrastructure;
+namespace Flow.Transactions.Infrastructure.Persistence;
 
 public class TransactionDbContextFactory
     : IDesignTimeDbContextFactory<TransactionDbContext>

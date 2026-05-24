@@ -1,6 +1,7 @@
+using Flow.Transactions.Domain.Entities;
 using Microsoft.EntityFrameworkCore;
 
-namespace Flow.Transactions.Infrastructure;
+namespace Flow.Transactions.Infrastructure.Persistence;
 
 public class TransactionDbContext : DbContext
 {

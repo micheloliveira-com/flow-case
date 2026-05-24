@@ -2,7 +2,7 @@ using System;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace Flow.Transactions.Application.Abstractions.Messaging;
+namespace Flow.Shared.Infrastructure.Abstractions.Messaging;
 
 public delegate Task MessageHandler<in T>(T message);
 

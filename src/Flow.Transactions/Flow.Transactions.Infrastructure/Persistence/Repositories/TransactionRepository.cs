@@ -1,6 +1,10 @@
 using Flow.Transactions.Infrastructure;
 using Microsoft.EntityFrameworkCore;
 using Flow.Transactions.Application.Abstractions.Persistence;
+using Flow.Transactions.Infrastructure.Persistence;
+using Flow.Transactions.Domain.Entities;
+
+namespace Flow.Transactions.Infrastructure.Persistence.Repositories;
 public sealed class TransactionRepository(
     TransactionDbContext db) : ITransactionRepository
 {

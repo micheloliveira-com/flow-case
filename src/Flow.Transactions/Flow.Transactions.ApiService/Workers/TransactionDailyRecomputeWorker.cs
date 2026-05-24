@@ -1,5 +1,8 @@
 using Flow.Transactions.Application.UseCases.DailyRecompute.ExecuteTransactionDailyRecompute;
 using Flow.Transactions.Infrastructure.Messaging.Consumers;
+using Flow.Shared.Infrastructure.Abstractions.Messaging;
+
+namespace Flow.Transactions.ApiService.Workers;
 
 public sealed class TransactionDailyRecomputeWorker(
     IServiceScopeFactory scopeFactory)

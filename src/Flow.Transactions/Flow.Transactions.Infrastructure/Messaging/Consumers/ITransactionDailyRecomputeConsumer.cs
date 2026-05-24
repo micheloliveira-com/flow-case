@@ -1,3 +1,4 @@
+using Flow.Shared.Infrastructure.Abstractions.Messaging;
 using Flow.Transactions.Application.Abstractions.Messaging;
 using Flow.Transactions.Application.Abstractions.Messaging.TransactionDailyRecompute;
 using System.Threading;

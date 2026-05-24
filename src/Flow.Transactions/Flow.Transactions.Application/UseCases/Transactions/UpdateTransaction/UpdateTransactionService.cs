@@ -1,6 +1,7 @@
 using Flow.Transactions.Application.Abstractions.Messaging;
 using Flow.Transactions.Application.Abstractions.Messaging.TransactionDailyRecompute;
 using Flow.Transactions.Application.Abstractions.Persistence;
+using Flow.Transactions.Domain.Entities;
 
 namespace Flow.Transactions.Application.UseCases.Transactions.UpdateTransaction;
 

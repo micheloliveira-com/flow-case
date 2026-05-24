@@ -1,7 +1,7 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Design;
 
-namespace Flow.Reports.Infrastructure;
+namespace Flow.Reports.Infrastructure.Persistence;
 
 public class ReportsDbContextFactory
     : IDesignTimeDbContextFactory<ReportsDbContext>

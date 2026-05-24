@@ -2,6 +2,7 @@ using Flow.Transactions.Application.Abstractions.Messaging.TransactionDailyRecom
 using Flow.Transactions.Application.Abstractions.Persistence;
 using Flow.Transactions.Application.Abstractions.Messaging;
 
+namespace Flow.Transactions.Application.UseCases.Transactions.DeleteTransaction;
 public sealed class DeleteTransactionService(
     ITransactionRepository repository,
     ITransactionDailyRecomputePublisher publisher)

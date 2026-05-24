@@ -4,9 +4,13 @@ using RabbitMQ.Client;
 using Flow.Reports.Infrastructure;
 using Flow.Reports.Application.UseCases.DailyBalance.ExecuteTransactionDailyBalance;
 using Flow.Reports.Infrastructure.Persistence.Repositories;
-using Flow.Transactions.Infrastructure.Messaging.Consumers;
 using Flow.Transactions.Infrastructure.Messaging.RabbitMq;
-using Flow.Transactions.Application.Abstractions.Messaging;
+using Flow.Reports.ApiService.Workers;
+using Flow.Reports.Application.UseCases.TransactionDailyBalance.GetTransactionDailyBalance;
+using Flow.Reports.Infrastructure.Messaging.Consumers;
+using Flow.Reports.Application.Abstractions.Persistence;
+using Flow.Shared.Infrastructure.Abstractions.Messaging;
+using Flow.Reports.Infrastructure.Persistence;
 
 var builder = WebApplication.CreateBuilder(args);
 

@@ -1,8 +1,9 @@
 
+using Flow.Transactions.Domain.Entities;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
-namespace Flow.Transactions.Infrastructure;
+namespace Flow.Transactions.Infrastructure.Persistence.Configuration;
 public class TransactionConfiguration : IEntityTypeConfiguration<Transaction>
 {
     public void Configure(EntityTypeBuilder<Transaction> builder)

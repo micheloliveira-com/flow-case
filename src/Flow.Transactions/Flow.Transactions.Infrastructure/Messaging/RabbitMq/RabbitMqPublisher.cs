@@ -1,6 +1,7 @@
 using System.Text.Json;
-using Flow.Transactions.Application.Abstractions.Messaging;
 using RabbitMQ.Client;
+
+namespace Flow.Transactions.Infrastructure.Messaging.RabbitMq;
 
 public sealed class RabbitMqPublisher(
     IConnection connection)

@@ -4,6 +4,8 @@ using System.Threading;
 using System.Threading.Tasks;
 using Flow.Reports.Domain.Entities;
 
+namespace Flow.Reports.Application.Abstractions.Persistence;
+
 public interface ITransactionDailyBalanceRepository
 {
     Task<List<TransactionDailyBalance>> GetAsync(

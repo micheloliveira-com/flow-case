@@ -6,11 +6,19 @@ using Microsoft.EntityFrameworkCore;
 using RabbitMQ.Client;
 using Flow.Transactions.Application.UseCases.Transactions.UpdateTransaction;
 using Flow.Transactions.Application.Abstractions.Persistence;
-using Flow.Transactions.Infrastructure.Messaging.Messages.TransactionDailyBalance;
 using Flow.Transactions.Application.UseCases.DailyRecompute.ExecuteTransactionDailyRecompute;
 using Flow.Transactions.Infrastructure.Messaging.RabbitMq;
-using Flow.Transactions.Infrastructure.Messaging.Messages;
 using Flow.Transactions.Infrastructure.Messaging.Consumers;
+using Flow.Transactions.Application.UseCases.Transactions.CreateTransaction;
+using Flow.Transactions.Application.UseCases.Transactions.GetTransactions;
+using Flow.Transactions.Application.UseCases.Transactions.DeleteTransaction;
+using Flow.Transactions.Infrastructure.Persistence;
+using Flow.Transactions.ApiService.Workers;
+using Flow.Transactions.Application.Abstractions.Messaging.TransactionDailyBalance;
+using Flow.Transactions.Infrastructure.Messaging.Publishers;
+using Flow.Transactions.Infrastructure.Messaging;
+using Flow.Shared.Infrastructure.Abstractions.Messaging;
+using Flow.Transactions.Infrastructure.Persistence.Repositories;
 
 var builder = WebApplication.CreateBuilder(args);
 

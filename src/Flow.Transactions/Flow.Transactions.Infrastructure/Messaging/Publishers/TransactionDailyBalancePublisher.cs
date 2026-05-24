@@ -1,9 +1,9 @@
 
 
 using Flow.Shared.Application.Abstractions.Messaging;
-using Flow.Transactions.Application.Abstractions.Messaging;
-using Flow.Transactions.Infrastructure.Messaging.Messages;
-using Flow.Transactions.Infrastructure.Messaging.Messages.TransactionDailyBalance;
+using Flow.Transactions.Application.Abstractions.Messaging.TransactionDailyBalance;
+
+namespace Flow.Transactions.Infrastructure.Messaging.Publishers;
 
 public sealed class TransactionDailyBalancePublisher : ITransactionDailyBalancePublisher
 {

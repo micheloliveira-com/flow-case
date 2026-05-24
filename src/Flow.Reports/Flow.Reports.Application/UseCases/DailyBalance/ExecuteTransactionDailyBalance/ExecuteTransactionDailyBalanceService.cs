@@ -1,6 +1,7 @@
 using Flow.Reports.Domain.Entities;
 using Microsoft.Extensions.Logging;
 using Flow.Shared.Application.Abstractions.Messaging;
+using Flow.Reports.Application.Abstractions.Persistence;
 
 namespace Flow.Reports.Application.UseCases.DailyBalance.ExecuteTransactionDailyBalance;
 
@@ -27,7 +28,7 @@ public sealed class ExecuteTransactionDailyBalanceService(
 
         if (current is null)
         {
-            current = new TransactionDailyBalance(
+            current = new Domain.Entities.TransactionDailyBalance(
                 message.Date,
                 message.Balance,
                 message.ProcessedAt);

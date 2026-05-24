@@ -1,6 +1,6 @@
-using Flow.Transactions.Application.Abstractions.Messaging;
+using Flow.Transactions.Application.Abstractions.Messaging.TransactionDailyRecompute;
 
-namespace Flow.Transactions.Application.Abstractions.Messaging.TransactionDailyRecompute;
+namespace Flow.Transactions.Infrastructure.Messaging.Publishers;
 
 public sealed class TransactionDailyRecomputePublisher : ITransactionDailyRecomputePublisher
 {

@@ -1,6 +1,7 @@
 using Flow.Reports.Application.UseCases.DailyBalance.ExecuteTransactionDailyBalance;
-using Flow.Transactions.Infrastructure.Messaging.Consumers;
+using Flow.Reports.Infrastructure.Messaging.Consumers;
 
+namespace Flow.Reports.ApiService.Workers;
 public sealed class TransactionDailyBalanceWorker(
     IServiceScopeFactory scopeFactory)
     : BackgroundService

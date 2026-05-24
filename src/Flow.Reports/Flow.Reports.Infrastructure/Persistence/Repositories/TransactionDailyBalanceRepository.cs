@@ -5,6 +5,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
 using Flow.Reports.Domain.Entities;
+using Flow.Reports.Application.Abstractions.Persistence;
 
 namespace Flow.Reports.Infrastructure.Persistence.Repositories;
 

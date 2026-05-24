@@ -3,10 +3,9 @@ using System.Text;
 using System.Text.Json;
 using System.Threading;
 using System.Threading.Tasks;
-using Flow.Transactions.Application.Abstractions.Messaging;
+using Flow.Shared.Infrastructure.Abstractions.Messaging;
 using RabbitMQ.Client;
 using RabbitMQ.Client.Events;
-using static Flow.Transactions.Application.Abstractions.Messaging.IMessageConsumer;
 
 namespace Flow.Transactions.Infrastructure.Messaging.RabbitMq;
 

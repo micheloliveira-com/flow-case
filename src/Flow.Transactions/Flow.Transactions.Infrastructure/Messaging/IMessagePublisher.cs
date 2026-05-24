@@ -1,4 +1,4 @@
-namespace Flow.Transactions.Application.Abstractions.Messaging;
+namespace Flow.Transactions.Infrastructure.Messaging;
 
 public interface IMessagePublisher
 {

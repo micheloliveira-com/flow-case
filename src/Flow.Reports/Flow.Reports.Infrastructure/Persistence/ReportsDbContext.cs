@@ -1,7 +1,7 @@
 using Microsoft.EntityFrameworkCore;
 using Flow.Reports.Domain.Entities;
 
-namespace Flow.Reports.Infrastructure;
+namespace Flow.Reports.Infrastructure.Persistence;
 
 public class ReportsDbContext : DbContext
 {

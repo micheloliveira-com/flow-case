@@ -2,10 +2,10 @@ using System;
 using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
-using Flow.Transactions.Application.Abstractions.Messaging;
 using Flow.Shared.Application.Abstractions.Messaging;
-namespace Flow.Transactions.Infrastructure.Messaging.Consumers;
+using Flow.Shared.Infrastructure.Abstractions.Messaging;
 
+namespace Flow.Reports.Infrastructure.Messaging.Consumers;
 public sealed class TransactionDailyBalanceConsumer(IMessageConsumer consumer)
                         : ITransactionDailyBalanceConsumer
 {

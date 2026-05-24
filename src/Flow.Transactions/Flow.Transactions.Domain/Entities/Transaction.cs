@@ -1,3 +1,7 @@
+using Flow.Transactions.Domain.Entities.Enums;
+
+namespace Flow.Transactions.Domain.Entities;
+
 public class Transaction
 {
     public Guid Id { get; private set; }

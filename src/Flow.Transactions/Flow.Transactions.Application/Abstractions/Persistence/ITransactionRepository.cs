@@ -1,3 +1,5 @@
+using Flow.Transactions.Domain.Entities;
+
 namespace Flow.Transactions.Application.Abstractions.Persistence;
 
 public interface ITransactionRepository
