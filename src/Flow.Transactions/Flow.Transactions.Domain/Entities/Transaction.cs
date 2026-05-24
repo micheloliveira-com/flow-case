@@ -54,5 +54,9 @@ public class Transaction
         Type = type;
     }
 
-    private void SetDate(DateOnly date) => Date = date;
+    private void SetDate(DateOnly date)
+    {
+        Guard(date != default, "Invalid date");
+        Date = date;
+    }
 }

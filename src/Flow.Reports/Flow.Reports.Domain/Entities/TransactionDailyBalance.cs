@@ -14,14 +14,37 @@ public class TransactionDailyBalance
 
     public TransactionDailyBalance(DateOnly date, decimal balance, DateTime processedAt)
     {
-        Date = date;
-        Balance = balance;
-        ProcessedAt = processedAt;
+        SetDate(date);
+        SetBalance(balance);
+        SetProcessedAt(processedAt);
     }
 
     public void Apply(decimal balance, DateTime processedAt)
     {
+        SetBalance(balance);
+        SetProcessedAt(processedAt);
+    }
+
+    private static void Guard(bool condition, string message)
+    {
+        if (!condition)
+            throw new InvalidOperationException(message);
+    }
+
+    private void SetDate(DateOnly date)
+    {
+        Guard(date != default, "Invalid date");
+        Date = date;
+    }
+
+    private void SetBalance(decimal balance)
+    {
         Balance = balance;
+    }
+
+    private void SetProcessedAt(DateTime processedAt)
+    {
+        Guard(processedAt != default, "Invalid processed date");
         ProcessedAt = processedAt;
     }
 }
