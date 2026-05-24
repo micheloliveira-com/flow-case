@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.EntityFrameworkCore;
 using RabbitMQ.Client;
 using Flow.Transactions.Workers;
+using Flow.Transactions.Application.UseCases.Transactions.UpdateTransaction;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -43,6 +44,7 @@ builder.Services.AddHostedService<TransactionDailyRecomputeWorker>();
 
 builder.Services.AddScoped<ICreateTransactionService, CreateTransactionService>();
 builder.Services.AddScoped<IGetTransactionsService, GetTransactionsService>();
+builder.Services.AddScoped<IUpdateTransactionService, UpdateTransactionService>();
 
 var app = builder.Build();
 
@@ -79,51 +81,15 @@ app.MapGet("/transactions", async (
     return await service.ExecuteAsync(request);
 });
 
-app.MapPut("/transactions/{id:guid}", async (TransactionDbContext db, Guid id, Transaction input, IConnection connection) =>
+app.MapPut("/transactions/{id:guid}", async (
+    Guid id,
+    UpdateTransactionRequest request,
+    IUpdateTransactionService service) =>
 {
-    var tx = await db.Transactions.FirstOrDefaultAsync(x => x.Id == id);
-    if (tx is null) return Results.NotFound();
+    var tx = await service.ExecuteAsync(id, request);
 
-    var oldDate = tx.Date;
-
-    var updated = new Transaction(
-        id: id,
-        amount: input.Amount,
-        type: input.Type,
-        date: input.Date,
-        description: input.Description
-    );
-
-    db.Entry(tx).CurrentValues.SetValues(updated);
-
-    await db.SaveChangesAsync();
-
-    using var channel = await connection.CreateChannelAsync();
-
-    await channel.QueueDeclareAsync(
-        queue: "transaction-daily-recompute",
-        durable: true,
-        exclusive: false,
-        autoDelete: false);
-
-    var affectedDates = new HashSet<DateOnly>
-    {
-        oldDate,
-        input.Date
-    };
-
-    foreach (var date in affectedDates)
-    {
-        await channel.BasicPublishAsync(
-            exchange: "",
-            routingKey: "transaction-daily-recompute",
-            mandatory: false,
-            basicProperties: new BasicProperties(),
-            body: System.Text.Json.JsonSerializer.SerializeToUtf8Bytes(new
-            {
-                Date = date
-            }));
-    }
+    if (tx is null)
+        return Results.NotFound();
 
     return Results.Ok(tx);
 });
