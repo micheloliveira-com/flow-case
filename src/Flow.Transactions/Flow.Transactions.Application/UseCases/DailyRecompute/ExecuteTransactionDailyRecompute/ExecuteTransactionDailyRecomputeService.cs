@@ -15,7 +15,7 @@ public sealed class ExecuteTransactionDailyRecomputeService(
     {
         var date = message.Date;
 
-        var transactions = await repository.GetAsync(date, date);
+        var transactions = await repository.GetByDateAsync(date);
 
         var balance = transactions.Sum(x =>
             x.Type == TransactionType.Credit

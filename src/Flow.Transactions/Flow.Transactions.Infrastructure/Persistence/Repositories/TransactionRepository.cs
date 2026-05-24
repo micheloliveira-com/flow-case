@@ -24,6 +24,14 @@ public sealed class TransactionRepository(
         return await query.OrderByDescending(x => x.Date).ToListAsync();
     }
 
+    public async Task<List<Transaction>> GetByDateAsync(DateOnly date)
+    {
+        return await db.Transactions
+            .AsNoTracking()
+            .Where(x => x.Date == date)
+            .ToListAsync();
+    }
+
     public async Task AddAsync(Transaction transaction)
     {
         await db.Transactions.AddAsync(transaction);

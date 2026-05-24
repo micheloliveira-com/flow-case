@@ -10,6 +10,8 @@ public interface ITransactionRepository
         DateOnly? start,
         DateOnly? end);
 
+    Task<List<Transaction>> GetByDateAsync(DateOnly date);
+
     Task AddAsync(Transaction transaction);
 
     Task UpdateAsync(Transaction transaction);
