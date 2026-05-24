@@ -2,21 +2,14 @@ using Flow.Transactions.Application.Abstractions.Messaging.TransactionDailyRecom
 
 namespace Flow.Transactions.Infrastructure.Messaging.Publishers;
 
-public sealed class TransactionDailyRecomputePublisher : ITransactionDailyRecomputePublisher
+public sealed class TransactionDailyRecomputePublisher(IMessagePublisher publisher) : ITransactionDailyRecomputePublisher
 {
     private const string RoutingKey = "transaction-daily-recompute";
-
-    private readonly IMessagePublisher _publisher;
-
-    public TransactionDailyRecomputePublisher(IMessagePublisher publisher)
-    {
-        _publisher = publisher;
-    }
 
     public Task PublishAsync(
         TransactionDailyRecomputeMessage message)
     {
-        return _publisher.PublishAsync(
+        return publisher.PublishAsync(
             RoutingKey,
             message);
     }

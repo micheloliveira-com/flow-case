@@ -5,21 +5,14 @@ using Flow.Transactions.Application.Abstractions.Messaging.TransactionDailyBalan
 
 namespace Flow.Transactions.Infrastructure.Messaging.Publishers;
 
-public sealed class TransactionDailyBalancePublisher : ITransactionDailyBalancePublisher
+public sealed class TransactionDailyBalancePublisher(IMessagePublisher publisher) : ITransactionDailyBalancePublisher
 {
     private const string RoutingKey = "transaction-daily-balance";
-
-    private readonly IMessagePublisher _publisher;
-
-    public TransactionDailyBalancePublisher(IMessagePublisher publisher)
-    {
-        _publisher = publisher;
-    }
 
     public Task PublishAsync(
         TransactionDailyBalanceMessage message)
     {
-        return _publisher.PublishAsync(
+        return publisher.PublishAsync(
             RoutingKey,
             message);
     }
