@@ -1,10 +1,10 @@
-using System.Text.Json;
-using Flow.Transactions.Infrastructure;
-using RabbitMQ.Client;
+using Flow.Transactions.Application.Abstractions.Messaging;
+using Flow.Transactions.Application.Abstractions.Messaging.TransactionDailyRecompute;
+using Flow.Transactions.Application.Abstractions.Persistence;
 
 public sealed class CreateTransactionService(
-    TransactionDbContext db,
-    IConnection connection)
+    ITransactionRepository repository,
+    ITransactionDailyRecomputePublisher publisher)
     : ICreateTransactionService
 {
     public async Task<Transaction> ExecuteAsync(
@@ -18,28 +18,12 @@ public sealed class CreateTransactionService(
             description: request.Description
         );
 
-        db.Transactions.Add(tx);
+        await repository.AddAsync(tx, cancellationToken);
 
-        await db.SaveChangesAsync(cancellationToken);
+        await publisher.PublishAsync(new TransactionDailyRecomputeMessage(tx.Date), cancellationToken);
 
-        using var channel = await connection.CreateChannelAsync();
-
-        await channel.QueueDeclareAsync(
-            queue: "transaction-daily-recompute",
-            durable: true,
-            exclusive: false,
-            autoDelete: false);
-
-        await channel.BasicPublishAsync(
-            exchange: "",
-            routingKey: "transaction-daily-recompute",
-            mandatory: false,
-            basicProperties: new BasicProperties(),
-            body: JsonSerializer.SerializeToUtf8Bytes(new
-            {
-                Date = tx.Date
-            }));
-
+        await repository.SaveChangesAsync(cancellationToken);
+        
         return tx;
     }
 }

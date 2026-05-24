@@ -9,6 +9,7 @@
   <ItemGroup>
     <ProjectReference Include="..\..\Flow.Aspire\Flow.Aspire.ServiceDefaults\Flow.Aspire.ServiceDefaults.csproj" />
     <ProjectReference Include="..\Flow.Transactions.Application\Flow.Transactions.Application.csproj" />
+    <ProjectReference Include="..\Flow.Transactions.Infrastructure\Flow.Transactions.Infrastructure.csproj" />
   </ItemGroup>
   
   <ItemGroup>

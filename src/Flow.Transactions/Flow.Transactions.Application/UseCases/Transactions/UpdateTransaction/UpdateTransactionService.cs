@@ -1,15 +1,12 @@
-
-
-using System.Text.Json;
-using Flow.Transactions.Infrastructure;
-using Microsoft.EntityFrameworkCore;
-using RabbitMQ.Client;
+using Flow.Transactions.Application.Abstractions.Messaging;
+using Flow.Transactions.Application.Abstractions.Messaging.TransactionDailyRecompute;
+using Flow.Transactions.Application.Abstractions.Persistence;
 
 namespace Flow.Transactions.Application.UseCases.Transactions.UpdateTransaction;
 
 public sealed class UpdateTransactionService(
-    TransactionDbContext db,
-    IConnection connection)
+    ITransactionRepository repository,
+    ITransactionDailyRecomputePublisher publisher)
     : IUpdateTransactionService
 {
     public async Task<Transaction?> ExecuteAsync(
@@ -17,8 +14,7 @@ public sealed class UpdateTransactionService(
         UpdateTransactionRequest request,
         CancellationToken cancellationToken = default)
     {
-        var tx = await db.Transactions
-            .FirstOrDefaultAsync(x => x.Id == id, cancellationToken);
+        var tx = await repository.GetByIdAsync(id, cancellationToken);
 
         if (tx is null)
             return null;
@@ -33,17 +29,7 @@ public sealed class UpdateTransactionService(
             description: request.Description
         );
 
-        db.Entry(tx).CurrentValues.SetValues(updated);
-
-        await db.SaveChangesAsync(cancellationToken);
-
-        using var channel = await connection.CreateChannelAsync();
-
-        await channel.QueueDeclareAsync(
-            queue: "transaction-daily-recompute",
-            durable: true,
-            exclusive: false,
-            autoDelete: false);
+        await repository.UpdateAsync(updated, cancellationToken);
 
         var affectedDates = new HashSet<DateOnly>
         {
@@ -53,17 +39,11 @@ public sealed class UpdateTransactionService(
 
         foreach (var date in affectedDates)
         {
-            await channel.BasicPublishAsync(
-                exchange: "",
-                routingKey: "transaction-daily-recompute",
-                mandatory: false,
-                basicProperties: new BasicProperties(),
-                body: JsonSerializer.SerializeToUtf8Bytes(new
-                {
-                    Date = date
-                }));
+            await publisher.PublishAsync(new TransactionDailyRecomputeMessage(date), cancellationToken);
         }
 
-        return tx;
+        await repository.SaveChangesAsync(cancellationToken);
+        
+        return updated;
     }
 }

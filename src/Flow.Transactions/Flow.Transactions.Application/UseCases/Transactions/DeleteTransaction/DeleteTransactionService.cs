@@ -1,47 +1,29 @@
-using System.Text.Json;
-using Flow.Transactions.Infrastructure;
-using Microsoft.EntityFrameworkCore;
-using RabbitMQ.Client;
+using Flow.Transactions.Application.Abstractions.Messaging.TransactionDailyRecompute;
+using Flow.Transactions.Application.Abstractions.Persistence;
+using Flow.Transactions.Application.Abstractions.Messaging;
 
 public sealed class DeleteTransactionService(
-    TransactionDbContext db,
-    IConnection connection)
+    ITransactionRepository repository,
+    ITransactionDailyRecomputePublisher publisher)
     : IDeleteTransactionService
 {
     public async Task<bool> ExecuteAsync(
         DeleteTransactionRequest request,
         CancellationToken cancellationToken = default)
     {
-        var tx = await db.Transactions
-            .FirstOrDefaultAsync(x => x.Id == request.Id, cancellationToken);
+        var tx = await repository.GetByIdAsync(request.Id, cancellationToken);
 
         if (tx is null)
             return false;
 
         var date = tx.Date;
 
-        db.Transactions.Remove(tx);
+        await repository.RemoveAsync(tx, cancellationToken);
 
-        await db.SaveChangesAsync(cancellationToken);
+        await publisher.PublishAsync(new TransactionDailyRecomputeMessage(date), cancellationToken);
 
-        using var channel = await connection.CreateChannelAsync();
-
-        await channel.QueueDeclareAsync(
-            queue: "transaction-daily-recompute",
-            durable: true,
-            exclusive: false,
-            autoDelete: false);
-
-        await channel.BasicPublishAsync(
-            exchange: "",
-            routingKey: "transaction-daily-recompute",
-            mandatory: false,
-            basicProperties: new BasicProperties(),
-            body: JsonSerializer.SerializeToUtf8Bytes(new
-            {
-                Date = date
-            }));
-
+        await repository.SaveChangesAsync(cancellationToken);
+        
         return true;
     }
 }
