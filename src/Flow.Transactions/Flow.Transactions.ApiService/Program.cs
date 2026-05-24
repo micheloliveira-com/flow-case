@@ -42,6 +42,7 @@ builder.AddRabbitMQClient("rabbitmq");
 builder.Services.AddHostedService<TransactionDailyRecomputeWorker>();
 
 builder.Services.AddScoped<ICreateTransactionService, CreateTransactionService>();
+builder.Services.AddScoped<IGetTransactionsService, GetTransactionsService>();
 
 var app = builder.Build();
 
@@ -72,21 +73,10 @@ app.MapPost("/transactions", async (
 });
 
 app.MapGet("/transactions", async (
-    TransactionDbContext db,
-    DateOnly? start,
-    DateOnly? end) =>
+    [AsParameters] GetTransactionsRequest request,
+    IGetTransactionsService service) =>
 {
-    var query = db.Transactions.AsNoTracking();
-
-    if (start.HasValue)
-        query = query.Where(x => x.Date >= start.Value);
-
-    if (end.HasValue)
-        query = query.Where(x => x.Date <= end.Value);
-        
-    query = query.OrderByDescending(x => x.Date);
-
-    return await query.ToListAsync();
+    return await service.ExecuteAsync(request);
 });
 
 app.MapPut("/transactions/{id:guid}", async (TransactionDbContext db, Guid id, Transaction input, IConnection connection) =>
