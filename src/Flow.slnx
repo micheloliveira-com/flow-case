@@ -10,4 +10,6 @@
   <Project Path="Flow.Transactions/Flow.Transactions.Domain/Flow.Transactions.Domain.csproj" />
   <Project Path="Flow.Transactions/Flow.Transactions.Infrastructure/Flow.Transactions.Infrastructure.csproj" />
   <Project Path="Flow.Web/Flow.Web.Blazor/Flow.Web.Blazor.csproj" />
+  <Project Path="Flow.Shared/Flow.Shared.Application.Abstractions/Flow.Shared.Application.Abstractions.csproj" />
+  <Project Path="Flow.Shared/Flow.Shared.Infrastructure.Abstractions/Flow.Shared.Infrastructure.Abstractions.csproj" />
 </Solution>

@@ -50,7 +50,6 @@ builder.AddRabbitMQClient("rabbitmq");
 
 builder.Services.AddScoped<IMessagePublisher, RabbitMqPublisher>();
 builder.Services.AddScoped<IMessageConsumer, RabbitMqConsumer>();
-builder.Services.AddScoped<IMessageConsumer, RabbitMqConsumer>();
 builder.Services.AddScoped<ITransactionDailyRecomputeConsumer, TransactionDailyRecomputeConsumer>();
 builder.Services.AddScoped<ITransactionDailyBalancePublisher, TransactionDailyBalancePublisher>();
 builder.Services.AddScoped<ITransactionDailyRecomputePublisher, TransactionDailyRecomputePublisher>();

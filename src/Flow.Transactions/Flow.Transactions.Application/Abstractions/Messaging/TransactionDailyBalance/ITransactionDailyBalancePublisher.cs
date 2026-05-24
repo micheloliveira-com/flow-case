@@ -1,5 +1,6 @@
 
 
+using Flow.Shared.Application.Abstractions.Messaging;
 using Flow.Transactions.Infrastructure.Messaging.Messages;
 
 namespace Flow.Transactions.Infrastructure.Messaging.Messages.TransactionDailyBalance;

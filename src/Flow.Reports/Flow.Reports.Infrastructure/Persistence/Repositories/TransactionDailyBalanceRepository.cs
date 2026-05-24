@@ -1,5 +1,3 @@
-
-
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -20,6 +18,7 @@ public sealed class TransactionDailyBalanceRepository(
         CancellationToken cancellationToken = default)
     {
         var query = db.TransactionDailyBalance.AsNoTracking();
+        query = query.Where(x => x.Balance != 0);
 
         if (start.HasValue)
             query = query.Where(x => x.Date >= start.Value);
@@ -30,5 +29,26 @@ public sealed class TransactionDailyBalanceRepository(
         return await query
             .OrderByDescending(x => x.Date)
             .ToListAsync(cancellationToken);
+    }
+
+    public async Task<TransactionDailyBalance?> GetByDateAsync(
+        DateOnly date,
+        CancellationToken cancellationToken = default)
+    {
+        return await db.TransactionDailyBalance
+            .FirstOrDefaultAsync(x => x.Date == date, cancellationToken);
+    }
+
+    public async Task SaveAsync(
+        CancellationToken cancellationToken = default)
+    {
+        await db.SaveChangesAsync(cancellationToken);
+    }
+
+    public async Task AddAsync(
+        TransactionDailyBalance entity,
+        CancellationToken cancellationToken = default)
+    {
+        await db.TransactionDailyBalance.AddAsync(entity, cancellationToken);
     }
 }

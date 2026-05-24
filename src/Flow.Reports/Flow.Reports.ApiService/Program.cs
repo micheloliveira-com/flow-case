@@ -1,9 +1,12 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.EntityFrameworkCore;
 using RabbitMQ.Client;
-using Flow.Reports.Workers;
 using Flow.Reports.Infrastructure;
+using Flow.Reports.Application.UseCases.DailyBalance.ExecuteTransactionDailyBalance;
 using Flow.Reports.Infrastructure.Persistence.Repositories;
+using Flow.Transactions.Infrastructure.Messaging.Consumers;
+using Flow.Transactions.Infrastructure.Messaging.RabbitMq;
+using Flow.Transactions.Application.Abstractions.Messaging;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -42,8 +45,11 @@ builder.Services.AddAuthorizationBuilder()
 builder.AddRabbitMQClient("rabbitmq");
 builder.Services.AddHostedService<TransactionDailyBalanceWorker>();
 
+builder.Services.AddScoped<IMessageConsumer, RabbitMqConsumer>();
 builder.Services.AddScoped<IGetTransactionDailyBalance, GetTransactionDailyBalance>();
 builder.Services.AddScoped<ITransactionDailyBalanceRepository, TransactionDailyBalanceRepository>();
+builder.Services.AddScoped<ITransactionDailyBalanceConsumer, TransactionDailyBalanceConsumer>();
+builder.Services.AddScoped<IExecuteTransactionDailyBalanceService, ExecuteTransactionDailyBalanceService>();
 
 var app = builder.Build();
 
