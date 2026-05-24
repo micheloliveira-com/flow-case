@@ -4,9 +4,12 @@ using Flow.Transactions.Application.Abstractions.Messaging.TransactionDailyRecom
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.EntityFrameworkCore;
 using RabbitMQ.Client;
-using Flow.Transactions.Workers;
 using Flow.Transactions.Application.UseCases.Transactions.UpdateTransaction;
 using Flow.Transactions.Application.Abstractions.Persistence;
+using Flow.Transactions.Infrastructure.Messaging.Messages.TransactionDailyBalance;
+using Flow.Transactions.Application.UseCases.DailyRecompute.ExecuteTransactionDailyRecompute;
+using Flow.Transactions.Infrastructure.Messaging.RabbitMq;
+using Flow.Transactions.Infrastructure.Messaging.Messages;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -45,8 +48,11 @@ builder.Services.AddAuthorizationBuilder()
 builder.AddRabbitMQClient("rabbitmq");
 
 builder.Services.AddScoped<IMessagePublisher, RabbitMqPublisher>();
+builder.Services.AddScoped<IMessageConsumer, RabbitMqConsumer>();
+builder.Services.AddScoped<ITransactionDailyBalancePublisher, TransactionDailyBalancePublisher>();
 builder.Services.AddScoped<ITransactionDailyRecomputePublisher, TransactionDailyRecomputePublisher>();
 builder.Services.AddScoped<ITransactionRepository, TransactionRepository>();
+builder.Services.AddScoped<IExecuteTransactionDailyRecomputeService, ExecuteTransactionDailyRecomputeService>();
 
 builder.Services.AddScoped<ICreateTransactionService, CreateTransactionService>();
 builder.Services.AddScoped<IGetTransactionsService, GetTransactionsService>();

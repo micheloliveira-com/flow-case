@@ -37,12 +37,13 @@ public sealed class UpdateTransactionService(
             request.Date
         };
 
+        await repository.SaveChangesAsync(cancellationToken);
+        
         foreach (var date in affectedDates)
         {
             await publisher.PublishAsync(new TransactionDailyRecomputeMessage(date), cancellationToken);
         }
 
-        await repository.SaveChangesAsync(cancellationToken);
         
         return updated;
     }

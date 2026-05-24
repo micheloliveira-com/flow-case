@@ -20,9 +20,10 @@ public sealed class CreateTransactionService(
 
         await repository.AddAsync(tx, cancellationToken);
 
+        await repository.SaveChangesAsync(cancellationToken);
+        
         await publisher.PublishAsync(new TransactionDailyRecomputeMessage(tx.Date), cancellationToken);
 
-        await repository.SaveChangesAsync(cancellationToken);
         
         return tx;
     }

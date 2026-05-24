@@ -20,9 +20,10 @@ public sealed class DeleteTransactionService(
 
         await repository.RemoveAsync(tx, cancellationToken);
 
+        await repository.SaveChangesAsync(cancellationToken);
+        
         await publisher.PublishAsync(new TransactionDailyRecomputeMessage(date), cancellationToken);
 
-        await repository.SaveChangesAsync(cancellationToken);
         
         return true;
     }
