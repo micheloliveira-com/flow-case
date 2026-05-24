@@ -23,7 +23,8 @@ public sealed class TransactionDailyBalanceConfiguration : IEntityTypeConfigurat
         builder.Property(x => x.ProcessedAt)
             .IsRequired();
 
-        builder.HasIndex(x => x.Date);
+        builder.HasIndex(x => x.Date)
+            .IsUnique();
 
         builder.HasIndex(x => x.ProcessedAt);
     }

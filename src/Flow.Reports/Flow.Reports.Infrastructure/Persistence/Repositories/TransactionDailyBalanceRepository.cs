@@ -38,7 +38,7 @@ public sealed class TransactionDailyBalanceRepository(
             .FirstOrDefaultAsync(x => x.Date == date);
     }
 
-    public async Task SaveAsync()
+    public async Task SaveChangesAsync()
     {
         await db.SaveChangesAsync();
     }

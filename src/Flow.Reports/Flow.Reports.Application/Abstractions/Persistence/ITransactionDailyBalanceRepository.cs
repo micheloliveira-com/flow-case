@@ -18,5 +18,5 @@ public interface ITransactionDailyBalanceRepository
     Task AddAsync(
         TransactionDailyBalance entity);
 
-    Task SaveAsync();
+    Task SaveChangesAsync();
 }

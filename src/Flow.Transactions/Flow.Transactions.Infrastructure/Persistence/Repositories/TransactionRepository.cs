@@ -8,8 +8,10 @@ namespace Flow.Transactions.Infrastructure.Persistence.Repositories;
 public sealed class TransactionRepository(
     TransactionDbContext db) : ITransactionRepository
 {
-    public Task<Transaction?> GetByIdAsync(Guid id)
-        => db.Transactions.FirstOrDefaultAsync(x => x.Id == id);
+    public async Task<Transaction?> GetByIdAsync(Guid id)
+    {
+        return await db.Transactions.FirstOrDefaultAsync(x => x.Id == id);
+    }
 
     public async Task<List<Transaction>> GetAsync(DateOnly? start, DateOnly? end)
     {
@@ -48,12 +50,13 @@ public sealed class TransactionRepository(
                 .SetProperty(x => x.Description, transaction.Description));
     }
 
-    public Task RemoveAsync(Transaction transaction)
+    public void Remove(Transaction transaction)
     {
         db.Transactions.Remove(transaction);
-        return Task.CompletedTask;
     }
 
     public async Task SaveChangesAsync()
-        => await db.SaveChangesAsync();
+    {
+        await db.SaveChangesAsync();
+    }
 }

@@ -40,6 +40,6 @@ public sealed class ExecuteTransactionDailyBalanceService(
             current.Apply(message.Balance, message.ProcessedAt);
         }
 
-        await repository.SaveAsync();
+        await repository.SaveChangesAsync();
     }
 }

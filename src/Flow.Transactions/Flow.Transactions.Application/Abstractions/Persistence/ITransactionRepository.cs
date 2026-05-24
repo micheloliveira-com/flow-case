@@ -16,7 +16,7 @@ public interface ITransactionRepository
 
     Task UpdateAsync(Transaction transaction);
 
-    Task RemoveAsync(Transaction transaction);
+    void Remove(Transaction transaction);
 
     Task SaveChangesAsync();
 }

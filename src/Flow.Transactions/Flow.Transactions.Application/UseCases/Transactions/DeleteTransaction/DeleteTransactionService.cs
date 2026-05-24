@@ -18,7 +18,7 @@ public sealed class DeleteTransactionService(
 
         var date = tx.Date;
 
-        await repository.RemoveAsync(tx);
+        repository.Remove(tx);
 
         await repository.SaveChangesAsync();
         

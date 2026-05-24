@@ -28,7 +28,8 @@ namespace Flow.Reports.Infrastructure.Migrations
             migrationBuilder.CreateIndex(
                 name: "IX_transaction_daily_balance_Date",
                 table: "transaction_daily_balance",
-                column: "Date");
+                column: "Date",
+                unique: true);
 
             migrationBuilder.CreateIndex(
                 name: "IX_transaction_daily_balance_ProcessedAt",
