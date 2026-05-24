@@ -9,20 +9,17 @@ using Flow.Transactions.Application.UseCases.DailyRecompute.ExecuteTransactionDa
 
 namespace Flow.Transactions.Infrastructure.Messaging.Consumers;
 
-public sealed class TransactionDailyRecomputeConsumer
-                    (IExecuteTransactionDailyRecomputeService service, IMessageConsumer consumer)
+public sealed class TransactionDailyRecomputeConsumer(IMessageConsumer consumer)
                         : ITransactionDailyRecomputeConsumer
 {
     private const string QueueName = "transaction-daily-recompute";
 
-    public async Task StartAsync(CancellationToken cancellationToken)
+    public async Task StartAsync(MessageHandler<TransactionDailyRecomputeMessage> handler,
+                                CancellationToken cancellationToken)
     {
         await consumer.SubscribeAsync<TransactionDailyRecomputeMessage>(
             QueueName,
-            async message =>
-            {
-                await service.ExecuteAsync(message, cancellationToken);
-            },
+            handler,
             cancellationToken);
     }
 }

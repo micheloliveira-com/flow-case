@@ -1,10 +1,10 @@
-
-
 using System;
 using System.Threading;
 using System.Threading.Tasks;
 
 namespace Flow.Transactions.Application.Abstractions.Messaging;
+
+public delegate Task MessageHandler<in T>(T message);
 
 /// <summary>
 /// Abstraction for message consumption (lightweight, transport-agnostic).
@@ -14,6 +14,6 @@ public interface IMessageConsumer
 {
     Task SubscribeAsync<T>(
         string queue,
-        Func<T, Task> handler,
+        MessageHandler<T> handler,
         CancellationToken cancellationToken = default);
 }

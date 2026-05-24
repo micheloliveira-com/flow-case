@@ -12,7 +12,17 @@ public sealed class TransactionDailyRecomputeWorker(
         var service = scope.ServiceProvider
             .GetRequiredService<ITransactionDailyRecomputeConsumer>();
 
-        await service.StartAsync(stoppingToken);
+        await service.StartAsync(
+            async message =>
+            {
+                using var innerScope = scopeFactory.CreateScope();
+
+                var useCase = innerScope.ServiceProvider
+                    .GetRequiredService<IExecuteTransactionDailyRecomputeService>();
+
+                await useCase.ExecuteAsync(message);
+            },
+            stoppingToken);
 
         while (!stoppingToken.IsCancellationRequested)
         {

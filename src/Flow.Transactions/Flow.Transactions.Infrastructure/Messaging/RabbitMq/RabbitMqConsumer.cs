@@ -7,6 +7,7 @@ using Flow.Transactions.Application.Abstractions.Messaging;
 using Flow.Transactions.Infrastructure.Messaging.Messages;
 using RabbitMQ.Client;
 using RabbitMQ.Client.Events;
+using static Flow.Transactions.Application.Abstractions.Messaging.IMessageConsumer;
 
 namespace Flow.Transactions.Infrastructure.Messaging.RabbitMq;
 
@@ -14,7 +15,7 @@ public sealed class RabbitMqConsumer(IConnection connection) : IMessageConsumer
 {
     public async Task SubscribeAsync<T>(
         string queue,
-        Func<T, Task> handler,
+        MessageHandler<T> handler,
         CancellationToken cancellationToken = default)
     {
         var channel = await connection.CreateChannelAsync();
