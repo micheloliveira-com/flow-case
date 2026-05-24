@@ -1,4 +1,5 @@
 using Flow.Transactions.Application.UseCases.DailyRecompute.ExecuteTransactionDailyRecompute;
+using Flow.Transactions.Infrastructure.Messaging.Consumers;
 
 public sealed class TransactionDailyRecomputeWorker(
     IServiceScopeFactory scopeFactory)
@@ -9,10 +10,9 @@ public sealed class TransactionDailyRecomputeWorker(
         using var scope = scopeFactory.CreateScope();
 
         var service = scope.ServiceProvider
-            .GetRequiredService<IExecuteTransactionDailyRecomputeService>();
+            .GetRequiredService<ITransactionDailyRecomputeConsumer>();
 
-        await service.ExecuteAsync(stoppingToken);
-
+        await service.StartAsync(stoppingToken);
 
         while (!stoppingToken.IsCancellationRequested)
         {

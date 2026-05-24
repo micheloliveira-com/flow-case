@@ -4,46 +4,24 @@ using Flow.Transactions.Application.Abstractions.Persistence;
 using Flow.Transactions.Application.UseCases.DailyRecompute.ExecuteTransactionDailyRecompute;
 using Flow.Transactions.Infrastructure.Messaging.Messages.TransactionDailyBalance;
 
-public sealed class ExecuteTransactionDailyRecomputeService : IExecuteTransactionDailyRecomputeService
-{
-    private readonly ITransactionRepository _repository;
-    private readonly IMessageConsumer _consumer;
-    private readonly ITransactionDailyBalancePublisher _publisher;
-
-    public ExecuteTransactionDailyRecomputeService(
+public sealed class ExecuteTransactionDailyRecomputeService(
         ITransactionRepository repository,
-        IMessageConsumer consumer,
-        ITransactionDailyBalancePublisher publisher)
+        ITransactionDailyBalancePublisher publisher) : IExecuteTransactionDailyRecomputeService
+{
+
+    public async Task ExecuteAsync(TransactionDailyRecomputeMessage message, CancellationToken cancellationToken = default)
     {
-        _repository = repository;
-        _consumer = consumer;
-        _publisher = publisher;
-    }
+        var date = message.Date;
 
-    public async Task ExecuteAsync(CancellationToken cancellationToken = default)
-    {
-        const string queue = "transaction-daily-recompute";
+        var transactions = await repository.GetAsync(date, date, cancellationToken);
 
-        await _consumer.SubscribeAsync<TransactionDailyRecomputeMessage>(
-            queue,
-            async message =>
-            {
-                if (message is null)
-                    return;
+        var balance = transactions.Sum(x =>
+            x.Type == TransactionType.Credit
+                ? x.Amount
+                : -x.Amount);
 
-                var date = message.Date;
-
-                var transactions = await _repository.GetAsync(date, date, cancellationToken);
-
-                var balance = transactions.Sum(x =>
-                    x.Type == TransactionType.Credit
-                        ? x.Amount
-                        : -x.Amount);
-
-                await _publisher.PublishAsync(
-                    new TransactionDailyBalanceMessage(date, balance, DateTime.UtcNow),
-                    cancellationToken);
-            },
+        await publisher.PublishAsync(
+            new TransactionDailyBalanceMessage(date, balance, DateTime.UtcNow),
             cancellationToken);
     }
 }

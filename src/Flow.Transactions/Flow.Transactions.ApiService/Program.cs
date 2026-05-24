@@ -10,6 +10,7 @@ using Flow.Transactions.Infrastructure.Messaging.Messages.TransactionDailyBalanc
 using Flow.Transactions.Application.UseCases.DailyRecompute.ExecuteTransactionDailyRecompute;
 using Flow.Transactions.Infrastructure.Messaging.RabbitMq;
 using Flow.Transactions.Infrastructure.Messaging.Messages;
+using Flow.Transactions.Infrastructure.Messaging.Consumers;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -49,6 +50,8 @@ builder.AddRabbitMQClient("rabbitmq");
 
 builder.Services.AddScoped<IMessagePublisher, RabbitMqPublisher>();
 builder.Services.AddScoped<IMessageConsumer, RabbitMqConsumer>();
+builder.Services.AddScoped<IMessageConsumer, RabbitMqConsumer>();
+builder.Services.AddScoped<ITransactionDailyRecomputeConsumer, TransactionDailyRecomputeConsumer>();
 builder.Services.AddScoped<ITransactionDailyBalancePublisher, TransactionDailyBalancePublisher>();
 builder.Services.AddScoped<ITransactionDailyRecomputePublisher, TransactionDailyRecomputePublisher>();
 builder.Services.AddScoped<ITransactionRepository, TransactionRepository>();
