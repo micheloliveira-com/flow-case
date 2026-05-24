@@ -3,6 +3,5 @@ namespace Flow.Transactions.Application.Abstractions.Messaging.TransactionDailyR
 public interface ITransactionDailyRecomputePublisher
 {
     Task PublishAsync(
-        TransactionDailyRecomputeMessage message,
-        CancellationToken cancellationToken = default);
+        TransactionDailyRecomputeMessage message);
 }

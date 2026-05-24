@@ -8,8 +8,7 @@ public sealed class CreateTransactionService(
     : ICreateTransactionService
 {
     public async Task<Transaction> ExecuteAsync(
-        CreateTransactionRequest request,
-        CancellationToken cancellationToken = default)
+        CreateTransactionRequest request)
     {
         var tx = new Transaction(
             amount: request.Amount,
@@ -18,11 +17,11 @@ public sealed class CreateTransactionService(
             description: request.Description
         );
 
-        await repository.AddAsync(tx, cancellationToken);
+        await repository.AddAsync(tx);
 
-        await repository.SaveChangesAsync(cancellationToken);
+        await repository.SaveChangesAsync();
         
-        await publisher.PublishAsync(new TransactionDailyRecomputeMessage(tx.Date), cancellationToken);
+        await publisher.PublishAsync(new TransactionDailyRecomputeMessage(tx.Date));
 
         
         return tx;

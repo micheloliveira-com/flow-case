@@ -8,6 +8,5 @@ namespace Flow.Transactions.Infrastructure.Messaging.Messages.TransactionDailyBa
 public interface ITransactionDailyBalancePublisher
 {
     Task PublishAsync(
-        TransactionDailyBalanceMessage message,
-        CancellationToken cancellationToken = default);
+        TransactionDailyBalanceMessage message);
 }

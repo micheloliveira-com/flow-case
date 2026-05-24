@@ -8,17 +8,13 @@ public interface ITransactionDailyBalanceRepository
 {
     Task<List<TransactionDailyBalance>> GetAsync(
         DateOnly? start,
-        DateOnly? end,
-        CancellationToken cancellationToken = default);
+        DateOnly? end);
 
     Task<TransactionDailyBalance?> GetByDateAsync(
-        DateOnly date,
-        CancellationToken cancellationToken = default);
+        DateOnly date);
 
     Task AddAsync(
-        TransactionDailyBalance entity,
-        CancellationToken cancellationToken = default);
+        TransactionDailyBalance entity);
 
-    Task SaveAsync(
-        CancellationToken cancellationToken = default);
+    Task SaveAsync();
 }

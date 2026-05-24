@@ -15,7 +15,7 @@ public sealed class RabbitMqConsumer(IConnection connection) : IMessageConsumer
     public async Task SubscribeAsync<T>(
         string queue,
         MessageHandler<T> handler,
-        CancellationToken cancellationToken = default)
+        CancellationToken cancellationToken)
     {
         var channel = await connection.CreateChannelAsync();
 

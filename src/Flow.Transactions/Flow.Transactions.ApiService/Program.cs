@@ -85,29 +85,26 @@ app.MapGet("/", () => "Transactions API is running.");
 
 app.MapPost("/transactions", async (
     CreateTransactionRequest request,
-    ICreateTransactionService service,
-    CancellationToken cancellationToken) =>
+    ICreateTransactionService service) =>
 {
-    var tx = await service.ExecuteAsync(request, cancellationToken);
+    var tx = await service.ExecuteAsync(request);
 
     return Results.Created($"/transactions/{tx.Id}", tx);
 });
 
 app.MapGet("/transactions", async (
     [AsParameters] GetTransactionsRequest request,
-    IGetTransactionsService service,
-    CancellationToken cancellationToken) =>
+    IGetTransactionsService service) =>
 {
-    return await service.ExecuteAsync(request, cancellationToken);
+    return await service.ExecuteAsync(request);
 });
 
 app.MapPut("/transactions/{id:guid}", async (
     Guid id,
     UpdateTransactionRequest request,
-    IUpdateTransactionService service,
-    CancellationToken cancellationToken) =>
+    IUpdateTransactionService service) =>
 {
-    var tx = await service.ExecuteAsync(id, request, cancellationToken);
+    var tx = await service.ExecuteAsync(id, request);
 
     if (tx is null)
         return Results.NotFound();
@@ -117,10 +114,9 @@ app.MapPut("/transactions/{id:guid}", async (
 
 app.MapDelete("/transactions/{id:guid}", async (
     [AsParameters] DeleteTransactionRequest request,
-    IDeleteTransactionService service,
-    CancellationToken cancellationToken) =>
+    IDeleteTransactionService service) =>
 {
-    var deleted = await service.ExecuteAsync(request, cancellationToken);
+    var deleted = await service.ExecuteAsync(request);
 
     if (!deleted)
         return Results.NotFound();

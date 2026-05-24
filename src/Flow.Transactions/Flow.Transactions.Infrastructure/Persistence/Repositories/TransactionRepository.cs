@@ -4,10 +4,10 @@ using Flow.Transactions.Application.Abstractions.Persistence;
 public sealed class TransactionRepository(
     TransactionDbContext db) : ITransactionRepository
 {
-    public Task<Transaction?> GetByIdAsync(Guid id, CancellationToken ct)
-        => db.Transactions.FirstOrDefaultAsync(x => x.Id == id, ct);
+    public Task<Transaction?> GetByIdAsync(Guid id)
+        => db.Transactions.FirstOrDefaultAsync(x => x.Id == id);
 
-    public async Task<List<Transaction>> GetAsync(DateOnly? start, DateOnly? end, CancellationToken ct)
+    public async Task<List<Transaction>> GetAsync(DateOnly? start, DateOnly? end)
     {
         var query = db.Transactions.AsNoTracking();
 
@@ -17,15 +17,15 @@ public sealed class TransactionRepository(
         if (end.HasValue)
             query = query.Where(x => x.Date <= end.Value);
 
-        return await query.OrderByDescending(x => x.Date).ToListAsync(ct);
+        return await query.OrderByDescending(x => x.Date).ToListAsync();
     }
 
-    public async Task AddAsync(Transaction transaction, CancellationToken ct)
+    public async Task AddAsync(Transaction transaction)
     {
-        await db.Transactions.AddAsync(transaction, ct);
+        await db.Transactions.AddAsync(transaction);
     }
 
-    public async Task UpdateAsync(Transaction transaction, CancellationToken ct)
+    public async Task UpdateAsync(Transaction transaction)
     {
         await db.Transactions
             .Where(x => x.Id == transaction.Id)
@@ -33,16 +33,15 @@ public sealed class TransactionRepository(
                 .SetProperty(x => x.Amount, transaction.Amount)
                 .SetProperty(x => x.Type, transaction.Type)
                 .SetProperty(x => x.Date, transaction.Date)
-                .SetProperty(x => x.Description, transaction.Description),
-                ct);
+                .SetProperty(x => x.Description, transaction.Description));
     }
 
-    public Task RemoveAsync(Transaction transaction, CancellationToken ct)
+    public Task RemoveAsync(Transaction transaction)
     {
         db.Transactions.Remove(transaction);
         return Task.CompletedTask;
     }
 
-    public async Task SaveChangesAsync(CancellationToken ct)
-        => await db.SaveChangesAsync(ct);
+    public async Task SaveChangesAsync()
+        => await db.SaveChangesAsync();
 }

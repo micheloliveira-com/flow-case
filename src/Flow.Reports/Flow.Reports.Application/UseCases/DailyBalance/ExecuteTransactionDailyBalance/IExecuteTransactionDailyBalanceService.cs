@@ -9,6 +9,5 @@ namespace Flow.Reports.Application.UseCases.DailyBalance.ExecuteTransactionDaily
 public interface IExecuteTransactionDailyBalanceService
 {
     Task ExecuteAsync(
-        TransactionDailyBalanceMessage message,
-        CancellationToken cancellationToken = default);
+        TransactionDailyBalanceMessage message);
 }

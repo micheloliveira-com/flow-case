@@ -11,10 +11,9 @@ public sealed class UpdateTransactionService(
 {
     public async Task<Transaction?> ExecuteAsync(
         Guid id,
-        UpdateTransactionRequest request,
-        CancellationToken cancellationToken = default)
+        UpdateTransactionRequest request)
     {
-        var tx = await repository.GetByIdAsync(id, cancellationToken);
+        var tx = await repository.GetByIdAsync(id);
 
         if (tx is null)
             return null;
@@ -29,7 +28,7 @@ public sealed class UpdateTransactionService(
             description: request.Description
         );
 
-        await repository.UpdateAsync(updated, cancellationToken);
+        await repository.UpdateAsync(updated);
 
         var affectedDates = new HashSet<DateOnly>
         {
@@ -37,11 +36,11 @@ public sealed class UpdateTransactionService(
             request.Date
         };
 
-        await repository.SaveChangesAsync(cancellationToken);
+        await repository.SaveChangesAsync();
         
         foreach (var date in affectedDates)
         {
-            await publisher.PublishAsync(new TransactionDailyRecomputeMessage(date), cancellationToken);
+            await publisher.PublishAsync(new TransactionDailyRecomputeMessage(date));
         }
 
         

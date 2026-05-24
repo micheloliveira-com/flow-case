@@ -14,8 +14,7 @@ public sealed class TransactionDailyBalanceRepository(
 {
     public async Task<List<TransactionDailyBalance>> GetAsync(
         DateOnly? start,
-        DateOnly? end,
-        CancellationToken cancellationToken = default)
+        DateOnly? end)
     {
         var query = db.TransactionDailyBalance.AsNoTracking();
         query = query.Where(x => x.Balance != 0);
@@ -28,27 +27,24 @@ public sealed class TransactionDailyBalanceRepository(
 
         return await query
             .OrderByDescending(x => x.Date)
-            .ToListAsync(cancellationToken);
+            .ToListAsync();
     }
 
     public async Task<TransactionDailyBalance?> GetByDateAsync(
-        DateOnly date,
-        CancellationToken cancellationToken = default)
+        DateOnly date)
     {
         return await db.TransactionDailyBalance
-            .FirstOrDefaultAsync(x => x.Date == date, cancellationToken);
+            .FirstOrDefaultAsync(x => x.Date == date);
     }
 
-    public async Task SaveAsync(
-        CancellationToken cancellationToken = default)
+    public async Task SaveAsync()
     {
-        await db.SaveChangesAsync(cancellationToken);
+        await db.SaveChangesAsync();
     }
 
     public async Task AddAsync(
-        TransactionDailyBalance entity,
-        CancellationToken cancellationToken = default)
+        TransactionDailyBalance entity)
     {
-        await db.TransactionDailyBalance.AddAsync(entity, cancellationToken);
+        await db.TransactionDailyBalance.AddAsync(entity);
     }
 }

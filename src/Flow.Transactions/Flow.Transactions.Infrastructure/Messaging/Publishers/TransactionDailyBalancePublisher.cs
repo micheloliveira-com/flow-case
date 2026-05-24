@@ -17,12 +17,10 @@ public sealed class TransactionDailyBalancePublisher : ITransactionDailyBalanceP
     }
 
     public Task PublishAsync(
-        TransactionDailyBalanceMessage message,
-        CancellationToken cancellationToken = default)
+        TransactionDailyBalanceMessage message)
     {
         return _publisher.PublishAsync(
             RoutingKey,
-            message,
-            cancellationToken);
+            message);
     }
 }

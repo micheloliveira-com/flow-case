@@ -10,10 +10,9 @@ public sealed class ExecuteTransactionDailyBalanceService(
     : IExecuteTransactionDailyBalanceService
 {
     public async Task ExecuteAsync(
-        TransactionDailyBalanceMessage message,
-        CancellationToken cancellationToken = default)
+        TransactionDailyBalanceMessage message)
     {
-        var current = await repository.GetByDateAsync(message.Date, cancellationToken);
+        var current = await repository.GetByDateAsync(message.Date);
 
         if (current is not null &&
             current.ProcessedAt >= message.ProcessedAt)
@@ -33,13 +32,13 @@ public sealed class ExecuteTransactionDailyBalanceService(
                 message.Balance,
                 message.ProcessedAt);
 
-            await repository.AddAsync(current, cancellationToken);
+            await repository.AddAsync(current);
         }
         else
         {
             current.Apply(message.Balance, message.ProcessedAt);
         }
 
-        await repository.SaveAsync(cancellationToken);
+        await repository.SaveAsync();
     }
 }

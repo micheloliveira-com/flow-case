@@ -10,9 +10,8 @@ public sealed class GetTransactionDailyBalance(
     : IGetTransactionDailyBalance
 {
     public async Task<List<TransactionDailyBalance>> ExecuteAsync(
-        GetTransactionDailyBalanceRequest request,
-        CancellationToken cancellationToken = default)
+        GetTransactionDailyBalanceRequest request)
     {
-        return await repository.GetAsync(request.Start, request.End, cancellationToken);
+        return await repository.GetAsync(request.Start, request.End);
     }
 }

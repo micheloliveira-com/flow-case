@@ -10,8 +10,7 @@ public class TransactionBalanceApiClient(HttpClient httpClient)
 {
     public async Task<TransactionDailyBalance[]> GetTransactionDailyBalancesAsync(
         DateOnly? start,
-        DateOnly? end,
-        CancellationToken cancellationToken = default)
+        DateOnly? end)
     {
         var url = "/transaction_daily_balance";
 
@@ -27,8 +26,7 @@ public class TransactionBalanceApiClient(HttpClient httpClient)
             url = QueryHelpers.AddQueryString(url, query);
 
         return await httpClient.GetFromJsonAsync<TransactionDailyBalance[]>(
-                   url,
-                   cancellationToken)
+                   url)
                ?? [];
     }
 }

@@ -7,8 +7,7 @@ public class TransactionApiClient(HttpClient httpClient)
 {
     public async Task<Transaction[]> GetTransactionsAsync(
         DateOnly? start,
-        DateOnly? end,
-        CancellationToken cancellationToken = default)
+        DateOnly? end)
     {
         var url = "/transactions";
 
@@ -24,30 +23,29 @@ public class TransactionApiClient(HttpClient httpClient)
             url = QueryHelpers.AddQueryString(url, query);
 
         return await httpClient.GetFromJsonAsync<Transaction[]>(
-                   url,
-                   cancellationToken)
+                   url)
                ?? [];
     }
 
-    public async Task<Transaction?> CreateAsync(Transaction input, CancellationToken cancellationToken = default)
+    public async Task<Transaction?> CreateAsync(Transaction input)
     {
-        var response = await httpClient.PostAsJsonAsync("/transactions", input, cancellationToken);
+        var response = await httpClient.PostAsJsonAsync("/transactions", input);
 
         if (!response.IsSuccessStatusCode)
             return null;
 
-        return await response.Content.ReadFromJsonAsync<Transaction>(cancellationToken: cancellationToken);
+        return await response.Content.ReadFromJsonAsync<Transaction>();
     }
 
-    public async Task<bool> UpdateAsync(Guid id, Transaction input, CancellationToken cancellationToken = default)
+    public async Task<bool> UpdateAsync(Guid id, Transaction input)
     {
-        var response = await httpClient.PutAsJsonAsync($"/transactions/{id}", input, cancellationToken);
+        var response = await httpClient.PutAsJsonAsync($"/transactions/{id}", input);
         return response.IsSuccessStatusCode;
     }
 
-    public async Task<bool> DeleteAsync(Guid id, CancellationToken cancellationToken = default)
+    public async Task<bool> DeleteAsync(Guid id)
     {
-        var response = await httpClient.DeleteAsync($"/transactions/{id}", cancellationToken);
+        var response = await httpClient.DeleteAsync($"/transactions/{id}");
         return response.IsSuccessStatusCode;
     }
 }

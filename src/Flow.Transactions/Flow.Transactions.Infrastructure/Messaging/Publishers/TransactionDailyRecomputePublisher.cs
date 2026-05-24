@@ -14,12 +14,10 @@ public sealed class TransactionDailyRecomputePublisher : ITransactionDailyRecomp
     }
 
     public Task PublishAsync(
-        TransactionDailyRecomputeMessage message,
-        CancellationToken cancellationToken = default)
+        TransactionDailyRecomputeMessage message)
     {
         return _publisher.PublishAsync(
             RoutingKey,
-            message,
-            cancellationToken);
+            message);
     }
 }

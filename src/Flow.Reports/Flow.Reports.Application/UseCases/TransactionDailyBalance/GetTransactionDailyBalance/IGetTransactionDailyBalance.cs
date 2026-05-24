@@ -8,6 +8,5 @@ using Flow.Reports.Domain.Entities;
 public interface IGetTransactionDailyBalance
 {
     Task<List<TransactionDailyBalance>> ExecuteAsync(
-        GetTransactionDailyBalanceRequest request,
-        CancellationToken cancellationToken = default);
+        GetTransactionDailyBalanceRequest request);
 }

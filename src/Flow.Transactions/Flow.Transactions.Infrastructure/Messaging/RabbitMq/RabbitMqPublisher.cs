@@ -8,18 +8,15 @@ public sealed class RabbitMqPublisher(
 {
     public async Task PublishAsync<T>(
         string routingKey,
-        T message,
-        CancellationToken cancellationToken = default)
+        T message)
     {
-        using var channel = await connection.CreateChannelAsync(
-            cancellationToken: cancellationToken);
+        using var channel = await connection.CreateChannelAsync();
 
         await channel.BasicPublishAsync(
             exchange: "",
             routingKey: routingKey,
             mandatory: false,
             basicProperties: new BasicProperties(),
-            body: JsonSerializer.SerializeToUtf8Bytes(message),
-            cancellationToken: cancellationToken);
+            body: JsonSerializer.SerializeToUtf8Bytes(message));
     }
 }

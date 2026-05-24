@@ -8,21 +8,20 @@ public sealed class DeleteTransactionService(
     : IDeleteTransactionService
 {
     public async Task<bool> ExecuteAsync(
-        DeleteTransactionRequest request,
-        CancellationToken cancellationToken = default)
+        DeleteTransactionRequest request)
     {
-        var tx = await repository.GetByIdAsync(request.Id, cancellationToken);
+        var tx = await repository.GetByIdAsync(request.Id);
 
         if (tx is null)
             return false;
 
         var date = tx.Date;
 
-        await repository.RemoveAsync(tx, cancellationToken);
+        await repository.RemoveAsync(tx);
 
-        await repository.SaveChangesAsync(cancellationToken);
+        await repository.SaveChangesAsync();
         
-        await publisher.PublishAsync(new TransactionDailyRecomputeMessage(date), cancellationToken);
+        await publisher.PublishAsync(new TransactionDailyRecomputeMessage(date));
 
         
         return true;

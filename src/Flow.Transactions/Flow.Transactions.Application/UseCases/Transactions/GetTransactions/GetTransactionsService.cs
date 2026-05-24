@@ -5,9 +5,8 @@ public sealed class GetTransactionsService(
     : IGetTransactionsService
 {
     public async Task<List<Transaction>> ExecuteAsync(
-        GetTransactionsRequest request,
-        CancellationToken cancellationToken = default)
+        GetTransactionsRequest request)
     {
-        return await repository.GetAsync(request.Start, request.End, cancellationToken);
+        return await repository.GetAsync(request.Start, request.End);
     }
 }

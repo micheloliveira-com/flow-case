@@ -15,5 +15,5 @@ public interface IMessageConsumer
     Task SubscribeAsync<T>(
         string queue,
         MessageHandler<T> handler,
-        CancellationToken cancellationToken = default);
+        CancellationToken cancellationToken);
 }

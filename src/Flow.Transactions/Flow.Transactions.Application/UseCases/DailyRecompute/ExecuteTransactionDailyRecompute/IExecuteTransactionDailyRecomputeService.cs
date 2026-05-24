@@ -6,5 +6,5 @@ namespace Flow.Transactions.Application.UseCases.DailyRecompute.ExecuteTransacti
 
 public interface IExecuteTransactionDailyRecomputeService
 {
-    Task ExecuteAsync(TransactionDailyRecomputeMessage message, CancellationToken cancellationToken = default);
+    Task ExecuteAsync(TransactionDailyRecomputeMessage message);
 }

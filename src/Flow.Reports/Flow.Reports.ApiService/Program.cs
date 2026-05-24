@@ -72,10 +72,9 @@ app.MapGet("/", () => "Reports API is running.");
 
 app.MapGet("/transaction_daily_balance", async (
     IGetTransactionDailyBalance service,
-    [AsParameters] GetTransactionDailyBalanceRequest request,
-    CancellationToken cancellationToken) =>
+    [AsParameters] GetTransactionDailyBalanceRequest request) =>
 {
-    return await service.ExecuteAsync(request, cancellationToken);
+    return await service.ExecuteAsync(request);
 });
 
 app.MapDefaultEndpoints();

@@ -10,11 +10,11 @@ public sealed class ExecuteTransactionDailyRecomputeService(
         ITransactionDailyBalancePublisher publisher) : IExecuteTransactionDailyRecomputeService
 {
 
-    public async Task ExecuteAsync(TransactionDailyRecomputeMessage message, CancellationToken cancellationToken = default)
+    public async Task ExecuteAsync(TransactionDailyRecomputeMessage message)
     {
         var date = message.Date;
 
-        var transactions = await repository.GetAsync(date, date, cancellationToken);
+        var transactions = await repository.GetAsync(date, date);
 
         var balance = transactions.Sum(x =>
             x.Type == TransactionType.Credit
@@ -22,7 +22,6 @@ public sealed class ExecuteTransactionDailyRecomputeService(
                 : -x.Amount);
 
         await publisher.PublishAsync(
-            new TransactionDailyBalanceMessage(date, balance, DateTime.UtcNow),
-            cancellationToken);
+            new TransactionDailyBalanceMessage(date, balance, DateTime.UtcNow));
     }
 }
