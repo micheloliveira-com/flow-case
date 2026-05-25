@@ -1,0 +1,168 @@
+﻿@page "/transaction"
+@rendermode InteractiveServer
+
+<h3 class="mb-4">Transactions</h3>
+
+@if (!string.IsNullOrEmpty(errorMessage))
+{
+    <div class="alert alert-danger">@errorMessage</div>
+}
+
+@if (isLoading)
+{
+    <p><em>Loading...</em></p>
+}
+else
+{
+    <div class="card shadow-sm">
+        <div class="card-body">
+
+            <div class="mb-3">
+
+                <div class="d-flex justify-content-between align-items-center">
+                    <button class="btn btn-success btn-sm" @onclick="OpenCreate">
+                        + Add transaction
+                    </button>
+                </div>
+
+                <div class="d-flex gap-2 mt-3">
+                    <input class="form-control form-control-sm"
+                           style="max-width: 180px;"
+                           type="date"
+                           @bind="filterStart"
+                           @bind:format="yyyy-MM-dd"
+                           @bind:after="Load" />
+
+                    <input class="form-control form-control-sm"
+                           style="max-width: 180px;"
+                           type="date"
+                           @bind="filterEnd"
+                           @bind:format="yyyy-MM-dd"
+                           @bind:after="Load" />
+                </div>
+
+            </div>
+
+            <div class="table-responsive">
+                <table class="table table-hover align-middle">
+                    <thead class="table-light">
+                        <tr>
+                            <th>Date</th>
+                            <th>Type</th>
+                            <th>Amount</th>
+                            <th>Description</th>
+                            <th class="text-end">Actions</th>
+                        </tr>
+                    </thead>
+
+                    <tbody>
+                        @if (transactions?.Any() != true)
+                        {
+                            <tr>
+                                <td colspan="5"><em>No transactions found.</em></td>
+                            </tr>
+                        }
+                        else
+                        {
+                            @foreach (var tx in transactions)
+                            {
+                                <tr class='@(tx.Type == TransactionType.Debit ? "table-danger" : "table-success")'>
+                                    <td>@tx.Date</td>
+                                    <td>@tx.Type</td>
+                                    <td>$@tx.Amount</td>
+                                    <td>@tx.Description</td>
+                                    <td class="text-end">
+                                        <button class="btn btn-sm btn-outline-primary me-2"
+                                                @onclick="() => StartEdit(tx)">
+                                            Edit
+                                        </button>
+
+                                        <button class="btn btn-sm btn-outline-danger"
+                                                @onclick="() => ConfirmDelete(tx.Id)">
+                                            Delete
+                                        </button>
+                                    </td>
+                                </tr>
+                            }
+                        }
+                    </tbody>
+                </table>
+            </div>
+
+        </div>
+    </div>
+}
+
+@if (isModalOpen)
+{
+    <div class="modal fade show d-block"
+         tabindex="-1"
+         style="background-color: rgba(0,0,0,0.5);">
+
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+
+                <div class="modal-header">
+                    <h5 class="modal-title">
+                        @(isEditing ? "Edit transaction" : "New transaction")
+                    </h5>
+
+                    <button type="button"
+                            class="btn-close"
+                            @onclick="CloseModal">
+                    </button>
+                </div>
+
+                <div class="modal-body">
+
+                    <div class="mb-3">
+                        <label class="form-label">Amount</label>
+                        <input class="form-control"
+                               type="number"
+                               @bind="formModel.Amount" />
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label">Type</label>
+                        <select class="form-select"
+                                @bind="formModel.Type">
+                            @foreach (var type in Enum.GetValues<TransactionType>())
+                            {
+                                <option value="@type">@type</option>
+                            }
+                        </select>
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label">Date</label>
+                        <input class="form-control"
+                               type="date"
+                               @bind="formModel.Date"
+                               @bind:format="yyyy-MM-dd" />
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label">Description</label>
+                        <input class="form-control"
+                               type="text"
+                               @bind="formModel.Description" />
+                    </div>
+
+                </div>
+
+                <div class="modal-footer">
+
+                    <button class="btn btn-secondary" @onclick="CloseModal">
+                        Cancel
+                    </button>
+
+                    <button class="btn btn-primary" @onclick="SaveForm">
+                        @(isEditing ? "Save changes" : "Create")
+                    </button>
+
+                </div>
+
+            </div>
+        </div>
+    </div>
+}
