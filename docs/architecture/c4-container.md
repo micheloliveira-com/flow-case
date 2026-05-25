@@ -10,52 +10,45 @@ C4Container
 
     System_Boundary(flow, "Flow") {
 
-        Container(web, "Flow.Web.Blazor", "Blazor Server",
-            "Frontend Blazor Server com login OIDC e interface")
+        Container(web, "Flow.Web.Blazor", "Blazor Server", "Frontend Blazor Server")
 
-        Container(transactionsApi, "Flow.Transactions.ApiService", "ASP.NET Core",
-            "API de lançamentos (CRUD + eventos de recomputação)")
+        Container(transactionsApi, "Transactions API", "ASP.NET Core", "Lançamentos")
 
-        Container(transactionsWorker, "TransactionDailyRecomputeWorker", "Worker Service",
-            "Processamento assíncrono de recomputação diária")
+        Container(transactionsWorker, "Transactions Worker", "Worker Service", "Recompute diário")
 
-        Container(reportsApi, "Flow.Reports.ApiService", "ASP.NET Core",
-            "API de relatórios e consultas de saldo diário")
+        Container(reportsApi, "Reports API", "ASP.NET Core", "Consultas")
 
-        Container(reportsWorker, "TransactionDailyBalanceWorker", "Worker Service",
-            "Consolidação diária de projeções")
+        Container(reportsWorker, "Reports Worker", "Worker Service", "Projeções")
 
-        Container(transactionsDb, "PostgreSQL (transactions)", "Database",
-            "Persistência de lançamentos")
+        Container(transactionsDb, "Transactions DB", "PostgreSQL", "Dados de lançamentos")
 
-        Container(reportsDb, "PostgreSQL (reports)", "Database",
-            "Persistência de projeções")
+        Container(reportsDb, "Reports DB", "PostgreSQL", "Dados de projeções")
     }
 
-    System_Ext(keycloak, "Keycloak", "OIDC / JWT Provider")
-    System_Ext(rabbitmq, "RabbitMQ", "Message Broker")
-    System_Ext(aspire, ".NET Aspire AppHost", "Orquestração local")
+    System_Ext(keycloak, "Keycloak", "OIDC")
+    System_Ext(rabbitmq, "RabbitMQ", "Messaging")
+    System_Ext(aspire, ".NET Aspire", "Orquestração")
 
-    Rel(user, web, "Usa via browser")
+    Rel(user, web, "Usa")
 
-    Rel(web, keycloak, "Login OIDC")
-    Rel(web, transactionsApi, "HTTP + Bearer token")
-    Rel(web, reportsApi, "HTTP + Bearer token")
+    Rel(web, keycloak, "Login")
+    Rel(web, transactionsApi, "HTTP")
+    Rel(web, reportsApi, "HTTP")
 
-    Rel(transactionsApi, keycloak, "Valida JWT")
-    Rel(reportsApi, keycloak, "Valida JWT")
+    Rel(transactionsApi, keycloak, "JWT")
+    Rel(reportsApi, keycloak, "JWT")
 
     Rel(transactionsApi, transactionsDb, "EF Core")
     Rel(reportsApi, reportsDb, "EF Core")
 
-    Rel(transactionsApi, rabbitmq, "Publica transaction-daily-recompute")
-    Rel(rabbitmq, transactionsWorker, "Consome recompute")
+    Rel(transactionsApi, rabbitmq, "Publica eventos")
+    Rel(rabbitmq, transactionsWorker, "Consome")
 
-    Rel(transactionsWorker, transactionsDb, "Consulta lançamentos do dia")
-    Rel(transactionsWorker, rabbitmq, "Publica transaction-daily-balance")
+    Rel(transactionsWorker, transactionsDb, "Lê/escreve")
+    Rel(transactionsWorker, rabbitmq, "Publica projeção")
 
-    Rel(rabbitmq, reportsWorker, "Consome balance events")
-    Rel(reportsWorker, reportsDb, "Atualiza projeções")
+    Rel(rabbitmq, reportsWorker, "Consome")
+    Rel(reportsWorker, reportsDb, "Atualiza")
 
     Rel(aspire, web, "Orquestra")
     Rel(aspire, transactionsApi, "Orquestra")
