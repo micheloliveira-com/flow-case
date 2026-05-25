@@ -33,6 +33,8 @@ A camada de Application concentra os contratos (ports) e casos de uso, enquanto 
 
 Todas as classes, interfaces e contratos foram organizados conforme suas responsabilidades e camadas apropriadas. O projeto Domain contém exclusivamente elementos de negócio, como entidades e regras de domínio, sem dependências de Application, Infrastructure ou ApiService, e sem a presença de DTOs ou modelos anêmicos. Essa organização segue os princípios de Clean Architecture e Domain-Driven Design.
 
+Projetos dedicados exclusivamente a contratos de Application / Infrastructure e camadas correlatas não foram criados, com o objetivo de reduzir complexidade e evitar fragmentação excessiva da solução. Em contrapartida, foi mantido o projeto Shared, utilizado para compartilhamento controlado de contratos e DTOs comuns entre os microsserviços, estritamente necessário para evitar repetição.
+
 O frontend Blazor foi incluído como interface operacional para demonstrar e validar os fluxos ponta a ponta. O foco principal de arquitetura, separação de responsabilidades e testes automatizados esteve nos contextos `Transactions`, `Reports`, mensageria, persistência, autenticação e observabilidade. Por isso, a UI pode conter limitações ou bugs de experiência que não invalidam o desenho arquitetural central do case.
 
 ## Visão da arquitetura
