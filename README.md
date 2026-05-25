@@ -23,6 +23,10 @@ Este projeto é de autoria de [micheloliveira-com](https://github.com/micheloliv
 
 Veja as [Imagens do sistema](docs/image/images.md)
 
+## Disclaimer
+
+O projeto segue boas práticas de arquitetura e design, mas evita a introdução de abstrações adicionais como formalização explícita de Unit of Work / repositórios genéricos, bem como o uso de DTOs tipados na camada de aplicação em substituição ao retorno direto de entidades, com o objetivo de reduzir complexidade e manter a solução mais simples, legível e adequada ao escopo do case.
+
 ## Visão da arquitetura
 
 Além da visão resumida abaixo, os diagramas C4 completos estão disponíveis em [docs/architecture](docs/architecture):
