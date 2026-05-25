@@ -10,12 +10,13 @@ O case técnico menciona segurança como requisito não funcional. A solução p
 
 ## Decisão
 
-Usar Keycloak como provedor de identidade local, integrado ao .NET Aspire.
+Usar Keycloak como provedor de identidade, integrado ao .NET Aspire.
 
 - O frontend Blazor autentica usuários via OpenID Connect.
 - As APIs validam tokens JWT Bearer emitidos pelo Keycloak.
 - O realm `flow` é importado automaticamente pelo AppHost.
 - A política padrão das APIs exige usuário autenticado.
+- Cada API valida o claim de audience do JWT de forma específica: `flow.transactions.api` para a Transactions API e `flow.reports.api` para a Reports API.
 
 ## Consequências positivas
 
@@ -36,4 +37,4 @@ Usar Keycloak como provedor de identidade local, integrado ao .NET Aspire.
 - Armazenar secrets fora do código.
 - Definir scopes e roles por operação.
 - Aplicar autorização por política nos endpoints.
-- Integrar com provedor corporativo de identidade, se necessário.
+- Integrar com provedor corporativo de identidade compatível com OIDC, se necessário.
