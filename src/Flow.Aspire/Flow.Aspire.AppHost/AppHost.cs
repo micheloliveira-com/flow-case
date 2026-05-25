@@ -3,8 +3,6 @@ using Projects;
 
 var builder = DistributedApplication.CreateBuilder(args);
 
-var cache = builder.AddRedis("cache");
-
 var username = builder.AddParameter("username", secret: true, value: "admin");
 var password = builder.AddParameter("password", secret: true, value: "admin");
 
@@ -42,8 +40,6 @@ var reportsApiService = builder.AddProject<Projects.Flow_Reports_ApiService>("re
 builder.AddProject<Projects.Flow_Web_Blazor>("webfrontend")
     .WithExternalHttpEndpoints()
     .WithHttpHealthCheck("/health")
-    .WithReference(cache)
-    .WaitFor(cache)
     .WithReference(keycloak)
     .WaitFor(keycloak)
     .WithReference(transactionsApiService)
