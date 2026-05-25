@@ -195,7 +195,7 @@ src/
 
 ## Instalação do Aspire CLI
 
-### Linux
+### Linux / macOS
 ```bash
 curl -sSL https://aspire.dev/install.sh | bash
 ```
