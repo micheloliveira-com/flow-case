@@ -17,7 +17,7 @@ Este projeto é de autoria de [micheloliveira-com](https://github.com/micheloliv
 - Orquestração local com .NET Aspire, incluindo containers, service discovery, health checks, logs e observabilidade.
 - Autenticação com Keycloak e OIDC.
 - Persistência separada por contexto usando PostgreSQL.
-- Testes automatizados para domínio, aplicação, infraestrutura e AppHost Aspire.
+- Testes automatizados para domínio, aplicação e infraestrutura.
 - Documentação arquitetural com ADRs.
 
 Veja as [Imagens do sistema](docs/image/images.md)
@@ -295,6 +295,8 @@ dotnet test src/Flow.Reports/Flow.Reports.Tests/Flow.Reports.Tests.csproj
 ```
 
 Os testes de `Transactions` e `Reports` cobrem regras de domínio, casos de uso, repositórios, publicadores e consumidores.
+
+![Imagem dos testes](assets/tests.jpg)
 
 ## Observabilidade e operação
 
