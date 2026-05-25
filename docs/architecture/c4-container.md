@@ -24,12 +24,13 @@ C4Container
 
         Container(reportsWorker, "TransactionDailyBalanceWorker", "Worker Service",
             "Consolidação diária de projeções")
+
+        ContainerDb(transactionsDb, "PostgreSQL (transactionsapiservicedb)", "Persistência de lançamentos")
+        ContainerDb(reportsDb, "PostgreSQL (reportsapiservicedb)", "Persistência de projeções")
     }
 
     System_Ext(keycloak, "Keycloak", "OIDC / JWT Provider")
     System_Ext(rabbitmq, "RabbitMQ", "Message Broker")
-    SystemDb(transactionsDb, "PostgreSQL (transactionsapiservicedb)", "Persistência de lançamentos")
-    SystemDb(reportsDb, "PostgreSQL (reportsapiservicedb)", "Persistência de projeções")
     System_Ext(aspire, ".NET Aspire AppHost", "Orquestração local")
 
     Rel(user, web, "Usa via browser")
