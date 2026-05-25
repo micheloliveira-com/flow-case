@@ -6,7 +6,7 @@ using Moq;
 
 namespace Flow.Reports.Tests.Application;
 
-public sealed class GetTransactionDailyBalanceTests
+public sealed class GetTransactionDailyBalanceServiceTests
 {
     [Fact]
     public async Task ExecuteAsync_ShouldReturnRepositoryResultUsingRequestPeriod()
@@ -30,9 +30,9 @@ public sealed class GetTransactionDailyBalanceTests
             .ReturnsAsync(expected)
             .Verifiable();
 
-        var service = new GetTransactionDailyBalance(
+        var service = new GetTransactionDailyBalanceService(
             repository.Object,
-            NullLogger<GetTransactionDailyBalance>.Instance);
+            NullLogger<GetTransactionDailyBalanceService>.Instance);
 
         // Act
         var actual = await service.ExecuteAsync(request);

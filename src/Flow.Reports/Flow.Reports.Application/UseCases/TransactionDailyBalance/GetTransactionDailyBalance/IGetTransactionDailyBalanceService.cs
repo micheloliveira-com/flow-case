@@ -7,7 +7,7 @@ using Flow.Reports.Domain.Entities;
 
 namespace Flow.Reports.Application.UseCases.TransactionDailyBalance.GetTransactionDailyBalance;
 
-public interface IGetTransactionDailyBalance
+public interface IGetTransactionDailyBalanceService
 {
     Task<List<Domain.Entities.TransactionDailyBalance>> ExecuteAsync(
         GetTransactionDailyBalanceRequest request);

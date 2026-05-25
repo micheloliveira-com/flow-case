@@ -52,7 +52,7 @@ builder.AddRabbitMQClient("rabbitmq");
 builder.Services.AddHostedService<TransactionDailyBalanceWorker>();
 
 builder.Services.AddScoped<IMessageConsumer, RabbitMqConsumer>();
-builder.Services.AddScoped<IGetTransactionDailyBalance, GetTransactionDailyBalance>();
+builder.Services.AddScoped<IGetTransactionDailyBalanceService, GetTransactionDailyBalanceService>();
 builder.Services.AddScoped<ITransactionDailyBalanceRepository, TransactionDailyBalanceRepository>();
 builder.Services.AddScoped<ITransactionDailyBalanceConsumer, TransactionDailyBalanceConsumer>();
 builder.Services.AddScoped<IExecuteTransactionDailyBalanceService, ExecuteTransactionDailyBalanceService>();

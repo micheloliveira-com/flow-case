@@ -15,41 +15,84 @@ public sealed class ExecuteTransactionDailyBalanceService(
     {
         var current = await repository.GetByDateAsync(message.Date);
 
-        if (current is not null &&
-            current.ProcessedAt >= message.ProcessedAt)
+        if (ShouldIgnore(message, current))
         {
-            logger.LogInformation(
-                "Ignoring outdated transaction daily balance for {Date}. Current ProcessedAt: {CurrentProcessedAt}. Incoming ProcessedAt: {IncomingProcessedAt}",
-                message.Date,
-                current.ProcessedAt,
-                message.ProcessedAt);
+            LogOutdatedMessageIgnored(message, current!);
             return;
         }
 
         if (current is null)
         {
-            current = new Domain.Entities.TransactionDailyBalance(
-                message.Date,
-                message.Balance,
-                message.ProcessedAt);
+            current = CreateTransactionDailyBalance(message);
 
             await repository.AddAsync(current);
-            logger.LogInformation(
-                "Created transaction daily balance for {Date} with balance {Balance} processed at {ProcessedAt}",
-                message.Date,
-                message.Balance,
-                message.ProcessedAt);
+
+            LogTransactionDailyBalanceCreated(message);
         }
         else
         {
-            current.Apply(message.Balance, message.ProcessedAt);
-            logger.LogInformation(
-                "Updated transaction daily balance for {Date} with balance {Balance} processed at {ProcessedAt}",
-                message.Date,
-                message.Balance,
-                message.ProcessedAt);
+            UpdateTransactionDailyBalance(current, message);
+
+            LogTransactionDailyBalanceUpdated(message);
         }
 
         await repository.SaveChangesAsync();
+    }
+
+    private static bool ShouldIgnore(
+        TransactionDailyBalanceMessage message,
+        Domain.Entities.TransactionDailyBalance? current)
+    {
+        return current is not null &&
+               current.ProcessedAt >= message.ProcessedAt;
+    }
+
+    private static Domain.Entities.TransactionDailyBalance CreateTransactionDailyBalance(
+        TransactionDailyBalanceMessage message)
+    {
+        return new Domain.Entities.TransactionDailyBalance(
+            message.Date,
+            message.Balance,
+            message.ProcessedAt);
+    }
+
+    private static void UpdateTransactionDailyBalance(
+        Domain.Entities.TransactionDailyBalance current,
+        TransactionDailyBalanceMessage message)
+    {
+        current.Apply(
+            message.Balance,
+            message.ProcessedAt);
+    }
+
+    private void LogOutdatedMessageIgnored(
+        TransactionDailyBalanceMessage message,
+        Domain.Entities.TransactionDailyBalance current)
+    {
+        logger.LogInformation(
+            "Ignoring outdated transaction daily balance for {Date}. Current ProcessedAt: {CurrentProcessedAt}. Incoming ProcessedAt: {IncomingProcessedAt}",
+            message.Date,
+            current.ProcessedAt,
+            message.ProcessedAt);
+    }
+
+    private void LogTransactionDailyBalanceCreated(
+        TransactionDailyBalanceMessage message)
+    {
+        logger.LogInformation(
+            "Created transaction daily balance for {Date} with balance {Balance} processed at {ProcessedAt}",
+            message.Date,
+            message.Balance,
+            message.ProcessedAt);
+    }
+
+    private void LogTransactionDailyBalanceUpdated(
+        TransactionDailyBalanceMessage message)
+    {
+        logger.LogInformation(
+            "Updated transaction daily balance for {Date} with balance {Balance} processed at {ProcessedAt}",
+            message.Date,
+            message.Balance,
+            message.ProcessedAt);
     }
 }

@@ -16,48 +16,86 @@ public sealed class UpdateTransactionService(
         Guid id,
         UpdateTransactionRequest request)
     {
-        var tx = await repository.GetByIdAsync(id);
+        var existing = await repository.GetByIdAsync(id);
 
-        if (tx is null)
+        if (existing is null)
         {
-            logger.LogWarning("Transaction {TransactionId} was not found for update", id);
+            LogTransactionNotFound(id);
             return null;
         }
 
-        var oldDate = tx.Date;
+        var updated = CreateUpdatedTransaction(id, request);
 
-        var updated = new Transaction(
+        await PersistAsync(updated);
+
+        LogTransactionUpdated(id, existing.Date, request.Date);
+
+        await PublishDailyRecomputeAsync(
+            id,
+            existing.Date,
+            request.Date);
+
+        return updated;
+    }
+
+    private async Task PersistAsync(Transaction transaction)
+    {
+        await repository.UpdateAsync(transaction);
+        await repository.SaveChangesAsync();
+    }
+
+    private async Task PublishDailyRecomputeAsync(
+        Guid transactionId,
+        DateOnly oldDate,
+        DateOnly newDate)
+    {
+        foreach (var date in GetAffectedDates(oldDate, newDate))
+        {
+            await publisher.PublishAsync(
+                new TransactionDailyRecomputeMessage(date));
+
+            logger.LogInformation(
+                "Published daily recompute request for transaction {TransactionId} on {Date}",
+                transactionId,
+                date);
+        }
+    }
+
+    private static Transaction CreateUpdatedTransaction(
+        Guid id,
+        UpdateTransactionRequest request)
+    {
+        return new Transaction(
             id: id,
             amount: request.Amount,
             type: request.Type,
             date: request.Date,
-            description: request.Description
-        );
+            description: request.Description);
+    }
 
-        await repository.UpdateAsync(updated);
+    private static IEnumerable<DateOnly> GetAffectedDates(
+        DateOnly oldDate,
+        DateOnly newDate)
+    {
+        return new[] { oldDate, newDate }.Distinct();
+    }
+
+    private void LogTransactionNotFound(Guid id)
+    {
+        logger.LogWarning(
+            "Transaction {TransactionId} was not found for update",
+            id);
+    }
+
+    private void LogTransactionUpdated(
+        Guid id,
+        DateOnly oldDate,
+        DateOnly newDate)
+    {
         logger.LogInformation(
             "Updated transaction {TransactionId}. Old date: {OldDate}. New date: {NewDate}",
             id,
             oldDate,
-            request.Date);
-
-        var affectedDates = new HashSet<DateOnly>
-        {
-            oldDate,
-            request.Date
-        };
-
-        await repository.SaveChangesAsync();
-
-        foreach (var date in affectedDates)
-        {
-            await publisher.PublishAsync(new TransactionDailyRecomputeMessage(date));
-            logger.LogInformation(
-                "Published daily recompute request for updated transaction {TransactionId} on {Date}",
-                id,
-                date);
-        }
-
-        return updated;
+            newDate);
     }
 }
