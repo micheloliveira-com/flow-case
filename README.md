@@ -204,7 +204,7 @@ curl -sSL https://aspire.dev/install.sh | bash
 irm https://aspire.dev/install.ps1 | iex
 ```
 
-Verificar instalação:
+Verifique a instalação em um novo terminal:
 
 ```bash
 aspire --version
