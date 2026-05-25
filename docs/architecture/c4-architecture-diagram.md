@@ -123,7 +123,7 @@ Armazena dados transacionais.
 Armazena projeções de leitura.
 
 ### Seq
-Centraliza logs estruturados emitidos pelas APIs durante a execução pelo AppHost Aspire.
+Centraliza logs estruturados emitidos pelas APIs durante a execução.
 
 ---
 

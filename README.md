@@ -94,7 +94,7 @@ flowchart TD
 | `Flow.Web.Blazor` | Interface web para lançamentos e consulta de saldo diário. Existe para validar os fluxos funcionais do case, mas não foi o principal foco arquitetural da solução. |
 | `Flow.Transactions.ApiService` | API de controle de lançamentos. Expõe CRUD de transações e publica eventos de recomputação diária. |
 | `Flow.Reports.ApiService` | API de relatórios. Consulta o saldo diário consolidado materializado. |
-| `Seq` | Centraliza logs estruturados das APIs durante a execução pelo AppHost Aspire. |
+| `Seq` | Centraliza logs estruturados das APIs durante a execução. |
 | `Flow.Transactions.*` | Camadas de domínio, aplicação, infraestrutura e testes do contexto de lançamentos. |
 | `Flow.Reports.*` | Camadas de domínio, aplicação, infraestrutura e testes do contexto de relatórios. |
 | `Flow.Shared.*` | Contratos e abstrações compartilhadas entre os serviços. |
