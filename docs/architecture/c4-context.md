@@ -3,6 +3,7 @@
 Este diagrama apresenta a solução no nível de contexto, mostrando o usuário, o sistema Flow e as principais dependências de plataforma usadas para autenticação, mensageria, persistência e orquestração local.
 
 ```mermaid
+%%{init: {'theme': 'base', 'themeVariables': { 'background': '#ffffff' }}}%%
 C4Context
     title Flow - Contexto do Sistema
 
