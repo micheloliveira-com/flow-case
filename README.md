@@ -171,16 +171,16 @@ O AppHost também executa as migrations dos bancos automaticamente na inicializa
 
 ## Artefatos e deploy
 
-Para geração de artefatos e deploy em Kubernetes, o projeto pode seguir o fluxo oficial de deployment do .NET Aspire: [aspire.dev/deployment/kubernetes](https://aspire.dev/deployment/kubernetes/).
+O projeto ainda não está configurado para deploy em Kubernetes. Para uma evolução de produção, o AppHost do .NET Aspire poderia ser preparado para geração de artefatos e deployment seguindo o fluxo oficial: [aspire.dev/deployment/kubernetes](https://aspire.dev/deployment/kubernetes/).
 
-Comandos principais:
+Nesse cenário, os comandos principais seriam:
 
 ```bash
 aspire publish
 aspire deploy
 ```
 
-O comando `aspire publish` gera os artefatos necessários para implantação, enquanto `aspire deploy` aplica o deployment no ambiente configurado.
+O comando `aspire publish` gera os artefatos necessários para implantação, enquanto `aspire deploy` aplica o deployment no ambiente configurado. Essa configuração também poderia compor uma estratégia de Infrastructure as Code, com manifests versionados e empacotamento via Helm para parametrização por ambiente.
 
 ## Login local
 
