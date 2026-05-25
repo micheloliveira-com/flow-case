@@ -6,7 +6,7 @@ A aplicação foi implementada em C# com .NET Aspire, usando uma arquitetura dis
 
 ## Autoria e rastreabilidade
 
-Este projeto é de autoria de [micheloliveira-com](https://github.com/micheloliveira-com). Todo o histórico de desenvolvimento pode ser auditado no repositório público, a partir do commit da POC inicial: [8f67daaa7825bcc399ef2b3f7f336c8f61282417](https://github.com/micheloliveira-com/distributed-flow-transactions/commit/8f67daaa7825bcc399ef2b3f7f336c8f61282417).
+Este projeto é de autoria de [micheloliveira-com](https://github.com/micheloliveira-com). Todo o histórico de desenvolvimento pode ser auditado no repositório público, a partir do commit da POC inicial: [8f67daaa7825bcc399ef2b3f7f336c8f61282417](https://github.com/micheloliveira-com/flow-case/commit/8f67daaa7825bcc399ef2b3f7f336c8f61282417).
 
 ## Objetivos atendidos
 
