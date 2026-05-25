@@ -10,7 +10,7 @@ Em uma arquitetura de microsserviços, compartilhar o mesmo banco entre contexto
 
 ## Decisão
 
-Usar bancos PostgreSQL separados:
+Usar bancos PostgreSQL separados em instâncias também separadas:
 
 - `transactionsapiservicedb`: banco do serviço `Transactions`.
 - `reportsapiservicedb`: banco do serviço `Reports`.
