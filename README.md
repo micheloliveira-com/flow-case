@@ -29,24 +29,51 @@ Além da visão resumida abaixo, os diagramas C4 completos estão disponíveis e
 | [C4 - Arquitetura](docs/architecture/c4-architecture-diagram.md) | Visão unificada do sistema contendo Contexto e Containers, com diagramas e Structurizr DSL embutido. |
 
 ```mermaid
-flowchart LR
-    User[Usuário] --> Web[Flow.Web.Blazor]
-    Web -->|HTTP + Bearer Token| TransactionsApi[Transactions API]
-    Web -->|HTTP + Bearer Token| ReportsApi[Reports API]
+flowchart TD
 
-    TransactionsApi --> TransactionsDb[(PostgreSQL<br/>Transactions DB)]
-    ReportsApi --> ReportsDb[(PostgreSQL<br/>Reports DB)]
+    subgraph UI[UI Layer]
+        User[Usuário]
+        Web[Flow.Web.Blazor]
+        User --> Web
+    end
 
-    TransactionsApi -->|transaction-daily-recompute| RabbitMQ[(RabbitMQ)]
-    RabbitMQ --> TransactionsWorker[Recompute Worker]
-    TransactionsWorker --> TransactionsDb
-    TransactionsWorker -->|transaction-daily-balance| RabbitMQ
-    RabbitMQ --> ReportsWorker[Daily Balance Worker]
-    ReportsWorker --> ReportsDb
+    subgraph API[API Layer]
+        TransactionsApi[Transactions API]
+        ReportsApi[Reports API]
 
-    Web --> Keycloak[Keycloak]
-    TransactionsApi --> Keycloak
-    ReportsApi --> Keycloak
+        Web --> TransactionsApi
+        Web --> ReportsApi
+    end
+
+    subgraph AUTH[Auth Layer]
+        Keycloak[Keycloak]
+
+        Web --> Keycloak
+        TransactionsApi --> Keycloak
+        ReportsApi --> Keycloak
+    end
+
+    subgraph DATA[Data Layer]
+        TransactionsDb[(Transactions DB)]
+        ReportsDb[(Reports DB)]
+
+        TransactionsApi --> TransactionsDb
+        ReportsApi --> ReportsDb
+    end
+
+    subgraph EVENT[Event Layer]
+        RabbitMQ[(RabbitMQ)]
+        TransactionsWorker[Transactions Worker]
+        ReportsWorker[Reports Worker]
+
+        TransactionsApi --> RabbitMQ
+        RabbitMQ --> TransactionsWorker
+        TransactionsWorker --> TransactionsDb
+        TransactionsWorker --> RabbitMQ
+
+        RabbitMQ --> ReportsWorker
+        ReportsWorker --> ReportsDb
+    end
 ```
 
 ## Componentes
