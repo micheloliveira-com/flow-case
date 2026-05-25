@@ -25,8 +25,11 @@ C4Container
         Container(reportsWorker, "TransactionDailyBalanceWorker", "Worker Service",
             "Consolidação diária de projeções")
 
-        ContainerDb(transactionsDb, "PostgreSQL (transactionsapiservicedb)", "Persistência de lançamentos")
-        ContainerDb(reportsDb, "PostgreSQL (reportsapiservicedb)", "Persistência de projeções")
+        Container(transactionsDb, "PostgreSQL (transactions)", "Database",
+            "Persistência de lançamentos")
+
+        Container(reportsDb, "PostgreSQL (reports)", "Database",
+            "Persistência de projeções")
     }
 
     System_Ext(keycloak, "Keycloak", "OIDC / JWT Provider")
