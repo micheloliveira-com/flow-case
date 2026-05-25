@@ -195,10 +195,11 @@ src/
 
 ## Instalação do Aspire CLI
 
+### Linux
 ```bash
 curl -sSL https://aspire.dev/install.sh | bash
 ```
-
+### Windows
 ```powershell
 irm https://aspire.dev/install.ps1 | iex
 ```
