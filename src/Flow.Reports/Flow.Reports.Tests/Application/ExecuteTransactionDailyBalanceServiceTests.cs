@@ -3,6 +3,7 @@ using Flow.Reports.Application.UseCases.DailyBalance.ExecuteTransactionDailyBala
 using Flow.Reports.Domain.Entities;
 using Flow.Shared.Application.Abstractions.Messaging;
 using Microsoft.Extensions.Logging.Abstractions;
+using Moq;
 
 namespace Flow.Reports.Tests.Application;
 
@@ -12,22 +13,35 @@ public sealed class ExecuteTransactionDailyBalanceServiceTests
     public async Task ExecuteAsync_WhenBalanceDoesNotExist_ShouldAddAndSave()
     {
         // Arrange
-        var repository = new TransactionDailyBalanceRepositoryFake();
-        var service = CreateService(repository);
+        var repository = new Mock<ITransactionDailyBalanceRepository>(MockBehavior.Strict);
         var message = CreateMessage();
+
+        repository
+            .Setup(x => x.GetByDateAsync(message.Date))
+            .ReturnsAsync((TransactionDailyBalance?)null)
+            .Verifiable();
+
+        repository
+            .Setup(x => x.AddAsync(It.Is<TransactionDailyBalance>(entity =>
+                entity.Date == message.Date &&
+                entity.Balance == message.Balance &&
+                entity.ProcessedAt == message.ProcessedAt)))
+            .Returns(Task.CompletedTask)
+            .Verifiable();
+
+        repository
+            .Setup(x => x.SaveChangesAsync())
+            .Returns(Task.CompletedTask)
+            .Verifiable();
+
+        var service = CreateService(repository.Object);
 
         // Act
         await service.ExecuteAsync(message);
 
         // Assert
-        Assert.Equal(1, repository.GetByDateCalls);
-        Assert.Equal(1, repository.AddCalls);
-        Assert.Equal(1, repository.SaveChangesCalls);
-
-        var added = Assert.Single(repository.AddedEntities);
-        Assert.Equal(message.Date, added.Date);
-        Assert.Equal(message.Balance, added.Balance);
-        Assert.Equal(message.ProcessedAt, added.ProcessedAt);
+        repository.Verify();
+        repository.VerifyNoOtherCalls();
     }
 
     [Fact]
@@ -39,21 +53,31 @@ public sealed class ExecuteTransactionDailyBalanceServiceTests
             100m,
             new DateTime(2026, 5, 24, 9, 0, 0, DateTimeKind.Utc));
 
-        var repository = new TransactionDailyBalanceRepositoryFake(current);
-        var service = CreateService(repository);
+        var repository = new Mock<ITransactionDailyBalanceRepository>(MockBehavior.Strict);
         var message = CreateMessage(
             balance: 250m,
             processedAt: new DateTime(2026, 5, 24, 10, 0, 0, DateTimeKind.Utc));
+
+        repository
+            .Setup(x => x.GetByDateAsync(message.Date))
+            .ReturnsAsync(current)
+            .Verifiable();
+
+        repository
+            .Setup(x => x.SaveChangesAsync())
+            .Returns(Task.CompletedTask)
+            .Verifiable();
+
+        var service = CreateService(repository.Object);
 
         // Act
         await service.ExecuteAsync(message);
 
         // Assert
-        Assert.Equal(1, repository.GetByDateCalls);
-        Assert.Equal(0, repository.AddCalls);
-        Assert.Equal(1, repository.SaveChangesCalls);
         Assert.Equal(message.Balance, current.Balance);
         Assert.Equal(message.ProcessedAt, current.ProcessedAt);
+        repository.Verify();
+        repository.VerifyNoOtherCalls();
     }
 
     [Fact]
@@ -66,19 +90,24 @@ public sealed class ExecuteTransactionDailyBalanceServiceTests
             100m,
             processedAt);
 
-        var repository = new TransactionDailyBalanceRepositoryFake(current);
-        var service = CreateService(repository);
+        var repository = new Mock<ITransactionDailyBalanceRepository>(MockBehavior.Strict);
         var message = CreateMessage(balance: 250m, processedAt: processedAt);
+
+        repository
+            .Setup(x => x.GetByDateAsync(message.Date))
+            .ReturnsAsync(current)
+            .Verifiable();
+
+        var service = CreateService(repository.Object);
 
         // Act
         await service.ExecuteAsync(message);
 
         // Assert
-        Assert.Equal(1, repository.GetByDateCalls);
-        Assert.Equal(0, repository.AddCalls);
-        Assert.Equal(0, repository.SaveChangesCalls);
         Assert.Equal(100m, current.Balance);
         Assert.Equal(processedAt, current.ProcessedAt);
+        repository.Verify();
+        repository.VerifyNoOtherCalls();
     }
 
     [Fact]
@@ -91,25 +120,30 @@ public sealed class ExecuteTransactionDailyBalanceServiceTests
             100m,
             currentProcessedAt);
 
-        var repository = new TransactionDailyBalanceRepositoryFake(current);
-        var service = CreateService(repository);
+        var repository = new Mock<ITransactionDailyBalanceRepository>(MockBehavior.Strict);
         var message = CreateMessage(
             balance: 250m,
             processedAt: new DateTime(2026, 5, 24, 9, 59, 59, DateTimeKind.Utc));
+
+        repository
+            .Setup(x => x.GetByDateAsync(message.Date))
+            .ReturnsAsync(current)
+            .Verifiable();
+
+        var service = CreateService(repository.Object);
 
         // Act
         await service.ExecuteAsync(message);
 
         // Assert
-        Assert.Equal(1, repository.GetByDateCalls);
-        Assert.Equal(0, repository.AddCalls);
-        Assert.Equal(0, repository.SaveChangesCalls);
         Assert.Equal(100m, current.Balance);
         Assert.Equal(currentProcessedAt, current.ProcessedAt);
+        repository.Verify();
+        repository.VerifyNoOtherCalls();
     }
 
     private static ExecuteTransactionDailyBalanceService CreateService(
-        TransactionDailyBalanceRepositoryFake repository)
+        ITransactionDailyBalanceRepository repository)
     {
         return new ExecuteTransactionDailyBalanceService(
             repository,
@@ -124,42 +158,5 @@ public sealed class ExecuteTransactionDailyBalanceServiceTests
             new DateOnly(2026, 5, 24),
             balance,
             processedAt ?? new DateTime(2026, 5, 24, 10, 0, 0, DateTimeKind.Utc));
-    }
-
-    private sealed class TransactionDailyBalanceRepositoryFake(
-        TransactionDailyBalance? current = null)
-        : ITransactionDailyBalanceRepository
-    {
-        public int AddCalls { get; private set; }
-
-        public int GetByDateCalls { get; private set; }
-
-        public int SaveChangesCalls { get; private set; }
-
-        public List<TransactionDailyBalance> AddedEntities { get; } = [];
-
-        public Task AddAsync(TransactionDailyBalance entity)
-        {
-            AddCalls++;
-            AddedEntities.Add(entity);
-            return Task.CompletedTask;
-        }
-
-        public Task<List<TransactionDailyBalance>> GetAsync(DateOnly? start, DateOnly? end)
-        {
-            throw new NotSupportedException();
-        }
-
-        public Task<TransactionDailyBalance?> GetByDateAsync(DateOnly date)
-        {
-            GetByDateCalls++;
-            return Task.FromResult(current);
-        }
-
-        public Task SaveChangesAsync()
-        {
-            SaveChangesCalls++;
-            return Task.CompletedTask;
-        }
     }
 }

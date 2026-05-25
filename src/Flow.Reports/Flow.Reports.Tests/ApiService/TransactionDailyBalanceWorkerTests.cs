@@ -4,6 +4,7 @@ using Flow.Reports.Infrastructure.Messaging.Consumers;
 using Flow.Shared.Application.Abstractions.Messaging;
 using Flow.Shared.Infrastructure.Abstractions.Messaging;
 using Microsoft.Extensions.DependencyInjection;
+using Moq;
 
 namespace Flow.Reports.Tests.ApiService;
 
@@ -13,12 +14,15 @@ public sealed class TransactionDailyBalanceWorkerTests
     public async Task StartAsync_WhenMessageIsConsumed_ShouldExecuteUseCaseInScope()
     {
         // Arrange
-        var consumer = new TransactionDailyBalanceConsumerFake();
-        var useCase = new ExecuteTransactionDailyBalanceServiceFake();
+        var started = new TaskCompletionSource(TaskCreationOptions.RunContinuationsAsynchronously);
+        MessageHandler<TransactionDailyBalanceMessage>? handler = null;
+
+        var consumer = new Mock<ITransactionDailyBalanceConsumer>(MockBehavior.Strict);
+        var useCase = new Mock<IExecuteTransactionDailyBalanceService>(MockBehavior.Strict);
 
         await using var serviceProvider = new ServiceCollection()
-            .AddSingleton<ITransactionDailyBalanceConsumer>(consumer)
-            .AddSingleton<IExecuteTransactionDailyBalanceService>(useCase)
+            .AddSingleton(consumer.Object)
+            .AddSingleton(useCase.Object)
             .BuildServiceProvider();
 
         var scopeFactory = serviceProvider.GetRequiredService<IServiceScopeFactory>();
@@ -28,61 +32,34 @@ public sealed class TransactionDailyBalanceWorkerTests
             150m,
             new DateTime(2026, 5, 24, 10, 0, 0, DateTimeKind.Utc));
 
+        consumer
+            .Setup(x => x.StartAsync(
+                It.IsAny<MessageHandler<TransactionDailyBalanceMessage>>(),
+                It.IsAny<CancellationToken>()))
+            .Callback<MessageHandler<TransactionDailyBalanceMessage>, CancellationToken>((capturedHandler, _) =>
+            {
+                handler = capturedHandler;
+                started.SetResult();
+            })
+            .Returns(Task.CompletedTask)
+            .Verifiable();
+
+        useCase
+            .Setup(x => x.ExecuteAsync(message))
+            .Returns(Task.CompletedTask)
+            .Verifiable();
+
         // Act
         await worker.StartAsync(CancellationToken.None);
-        await consumer.WaitUntilStartedAsync();
-        await consumer.DispatchAsync(message);
+        await started.Task.WaitAsync(TimeSpan.FromSeconds(1));
+        Assert.NotNull(handler);
+        await handler(message);
         await worker.StopAsync(CancellationToken.None);
 
         // Assert
-        Assert.Equal(1, consumer.StartCalls);
-        Assert.Same(message, useCase.ExecutedMessage);
-        Assert.Equal(1, useCase.ExecuteCalls);
-    }
-
-    private sealed class TransactionDailyBalanceConsumerFake : ITransactionDailyBalanceConsumer
-    {
-        private readonly TaskCompletionSource started = new(
-            TaskCreationOptions.RunContinuationsAsynchronously);
-
-        private MessageHandler<TransactionDailyBalanceMessage>? handler;
-
-        public int StartCalls { get; private set; }
-
-        public Task StartAsync(
-            MessageHandler<TransactionDailyBalanceMessage> handler,
-            CancellationToken cancellationToken)
-        {
-            StartCalls++;
-            this.handler = handler;
-            started.SetResult();
-            return Task.CompletedTask;
-        }
-
-        public Task WaitUntilStartedAsync()
-        {
-            return started.Task.WaitAsync(TimeSpan.FromSeconds(1));
-        }
-
-        public Task DispatchAsync(TransactionDailyBalanceMessage message)
-        {
-            Assert.NotNull(handler);
-            return handler(message);
-        }
-    }
-
-    private sealed class ExecuteTransactionDailyBalanceServiceFake
-        : IExecuteTransactionDailyBalanceService
-    {
-        public int ExecuteCalls { get; private set; }
-
-        public TransactionDailyBalanceMessage? ExecutedMessage { get; private set; }
-
-        public Task ExecuteAsync(TransactionDailyBalanceMessage message)
-        {
-            ExecuteCalls++;
-            ExecutedMessage = message;
-            return Task.CompletedTask;
-        }
+        consumer.Verify();
+        useCase.Verify();
+        consumer.VerifyNoOtherCalls();
+        useCase.VerifyNoOtherCalls();
     }
 }
