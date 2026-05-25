@@ -1,6 +1,5 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.EntityFrameworkCore;
-using RabbitMQ.Client;
 using Flow.Reports.Infrastructure;
 using Flow.Reports.Application.UseCases.DailyBalance.ExecuteTransactionDailyBalance;
 using Flow.Reports.Infrastructure.Persistence.Repositories;
@@ -11,6 +10,7 @@ using Flow.Reports.Infrastructure.Messaging.Consumers;
 using Flow.Reports.Application.Abstractions.Persistence;
 using Flow.Shared.Infrastructure.Abstractions.Messaging;
 using Flow.Reports.Infrastructure.Persistence;
+using Flow.Reports.ApiService.Endpoints;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -74,14 +74,7 @@ if (app.Environment.IsDevelopment())
 app.UseAuthentication();
 app.UseAuthorization();
 
-app.MapGet("/", () => "Reports API is running.");
-
-app.MapGet("/transaction_daily_balance", async (
-    IGetTransactionDailyBalance service,
-    [AsParameters] GetTransactionDailyBalanceRequest request) =>
-{
-    return await service.ExecuteAsync(request);
-});
+app.MapReportEndpoints();
 
 app.MapDefaultEndpoints();
 

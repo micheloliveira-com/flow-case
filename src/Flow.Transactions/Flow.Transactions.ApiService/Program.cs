@@ -3,7 +3,6 @@ using Flow.Transactions.Application.Abstractions.Messaging;
 using Flow.Transactions.Application.Abstractions.Messaging.TransactionDailyRecompute;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.EntityFrameworkCore;
-using RabbitMQ.Client;
 using Flow.Transactions.Application.UseCases.Transactions.UpdateTransaction;
 using Flow.Transactions.Application.Abstractions.Persistence;
 using Flow.Transactions.Application.UseCases.DailyRecompute.ExecuteTransactionDailyRecompute;
@@ -19,6 +18,8 @@ using Flow.Transactions.Infrastructure.Messaging.Publishers;
 using Flow.Transactions.Infrastructure.Messaging;
 using Flow.Shared.Infrastructure.Abstractions.Messaging;
 using Flow.Transactions.Infrastructure.Persistence.Repositories;
+using Flow.Transactions.ApiService.Endpoints;
+using Flow.Transactions.ApiService.ExceptionHandling;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -27,6 +28,7 @@ builder.AddServiceDefaults();
 
 // Add services to the container.
 builder.Services.AddProblemDetails();
+builder.Services.AddExceptionHandler<DomainExceptionHandler>();
 
 // Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
 builder.Services.AddOpenApi();
@@ -70,8 +72,6 @@ builder.Services.AddScoped<ICreateTransactionService, CreateTransactionService>(
 builder.Services.AddScoped<IGetTransactionsService, GetTransactionsService>();
 builder.Services.AddScoped<IUpdateTransactionService, UpdateTransactionService>();
 builder.Services.AddScoped<IDeleteTransactionService, DeleteTransactionService>();
-
-
 builder.Services.AddHostedService<TransactionDailyRecomputeWorker>();
 
 var app = builder.Build();
@@ -91,73 +91,8 @@ if (app.Environment.IsDevelopment())
 app.UseAuthentication();
 app.UseAuthorization();
 
-app.MapGet("/", () => "Transactions API is running.");
-
-app.MapPost("/transactions", async (
-    CreateTransactionRequest request,
-    ICreateTransactionService service) =>
-{
-    try
-    {
-        var tx = await service.ExecuteAsync(request);
-
-        return Results.Created($"/transactions/{tx.Id}", tx);
-    }
-    catch (InvalidOperationException ex)
-    {
-        return DomainError(ex);
-    }
-});
-
-app.MapGet("/transactions", async (
-    [AsParameters] GetTransactionsRequest request,
-    IGetTransactionsService service) =>
-{
-    return await service.ExecuteAsync(request);
-});
-
-app.MapPut("/transactions/{id:guid}", async (
-    Guid id,
-    UpdateTransactionRequest request,
-    IUpdateTransactionService service) =>
-{
-    try
-    {
-        var tx = await service.ExecuteAsync(id, request);
-
-        if (tx is null)
-            return Results.NotFound();
-
-        return Results.Ok(tx);
-    }
-    catch (InvalidOperationException ex)
-    {
-        return DomainError(ex);
-    }
-});
-
-app.MapDelete("/transactions/{id:guid}", async (
-    [AsParameters] DeleteTransactionRequest request,
-    IDeleteTransactionService service) =>
-{
-    var deleted = await service.ExecuteAsync(request);
-
-    if (!deleted)
-        return Results.NotFound();
-
-    return Results.NoContent();
-});
-
-
+app.MapTransactionEndpoints();
 
 app.MapDefaultEndpoints();
 
 app.Run();
-
-static IResult DomainError(InvalidOperationException exception)
-{
-    return Results.Problem(
-        title: "Domain validation failed",
-        detail: exception.Message,
-        statusCode: StatusCodes.Status400BadRequest);
-}
