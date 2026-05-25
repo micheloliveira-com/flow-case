@@ -20,9 +20,7 @@ Este projeto é de autoria de [micheloliveira-com](https://github.com/micheloliv
 - Testes automatizados para domínio, aplicação, infraestrutura e AppHost Aspire.
 - Documentação arquitetural com ADRs.
 
-## Imagens do sistema
-
-Veja em: [Imagens do sistema](docs/image/images.md)
+Veja as [Imagens do sistema](docs/image/images.md)
 
 ## Visão da arquitetura
 
