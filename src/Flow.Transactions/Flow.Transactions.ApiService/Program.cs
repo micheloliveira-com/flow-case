@@ -95,9 +95,16 @@ app.MapPost("/transactions", async (
     CreateTransactionRequest request,
     ICreateTransactionService service) =>
 {
-    var tx = await service.ExecuteAsync(request);
+    try
+    {
+        var tx = await service.ExecuteAsync(request);
 
-    return Results.Created($"/transactions/{tx.Id}", tx);
+        return Results.Created($"/transactions/{tx.Id}", tx);
+    }
+    catch (InvalidOperationException ex)
+    {
+        return DomainError(ex);
+    }
 });
 
 app.MapGet("/transactions", async (
@@ -112,12 +119,19 @@ app.MapPut("/transactions/{id:guid}", async (
     UpdateTransactionRequest request,
     IUpdateTransactionService service) =>
 {
-    var tx = await service.ExecuteAsync(id, request);
+    try
+    {
+        var tx = await service.ExecuteAsync(id, request);
 
-    if (tx is null)
-        return Results.NotFound();
+        if (tx is null)
+            return Results.NotFound();
 
-    return Results.Ok(tx);
+        return Results.Ok(tx);
+    }
+    catch (InvalidOperationException ex)
+    {
+        return DomainError(ex);
+    }
 });
 
 app.MapDelete("/transactions/{id:guid}", async (
@@ -137,3 +151,11 @@ app.MapDelete("/transactions/{id:guid}", async (
 app.MapDefaultEndpoints();
 
 app.Run();
+
+static IResult DomainError(InvalidOperationException exception)
+{
+    return Results.Problem(
+        title: "Domain validation failed",
+        detail: exception.Message,
+        statusCode: StatusCodes.Status400BadRequest);
+}

@@ -34,22 +34,25 @@ public class TransactionApiClient(
         return transactions;
     }
 
-    public async Task<Transaction?> CreateAsync(Transaction input)
+    public async Task<Transaction> CreateAsync(Transaction input)
     {
         var response = await httpClient.PostAsJsonAsync("/transactions", input);
 
         if (!response.IsSuccessStatusCode)
         {
+            var message = await ApiErrorReader.ReadMessageAsync(response);
             logger.LogWarning(
-                "Failed to create transaction. Status code: {StatusCode}",
-                response.StatusCode);
-            return null;
+                "Failed to create transaction. Status code: {StatusCode}. Message: {Message}",
+                response.StatusCode,
+                message);
+            throw new ApiClientException(message);
         }
 
-        var transaction = await response.Content.ReadFromJsonAsync<Transaction>();
+        var transaction = await response.Content.ReadFromJsonAsync<Transaction>()
+            ?? throw new ApiClientException("The transactions API returned an empty response.");
         logger.LogInformation(
             "Created transaction {TransactionId} through transactions API",
-            transaction?.Id);
+            transaction.Id);
 
         return transaction;
     }
@@ -59,17 +62,18 @@ public class TransactionApiClient(
         var response = await httpClient.PutAsJsonAsync($"/transactions/{id}", input);
         if (!response.IsSuccessStatusCode)
         {
+            var message = await ApiErrorReader.ReadMessageAsync(response);
             logger.LogWarning(
-                "Failed to update transaction {TransactionId}. Status code: {StatusCode}",
+                "Failed to update transaction {TransactionId}. Status code: {StatusCode}. Message: {Message}",
                 id,
-                response.StatusCode);
+                response.StatusCode,
+                message);
+            throw new ApiClientException(message);
         }
-        else
-        {
-            logger.LogInformation(
-                "Updated transaction {TransactionId} through transactions API",
-                id);
-        }
+
+        logger.LogInformation(
+            "Updated transaction {TransactionId} through transactions API",
+            id);
 
         return response.IsSuccessStatusCode;
     }
@@ -79,17 +83,18 @@ public class TransactionApiClient(
         var response = await httpClient.DeleteAsync($"/transactions/{id}");
         if (!response.IsSuccessStatusCode)
         {
+            var message = await ApiErrorReader.ReadMessageAsync(response);
             logger.LogWarning(
-                "Failed to delete transaction {TransactionId}. Status code: {StatusCode}",
+                "Failed to delete transaction {TransactionId}. Status code: {StatusCode}. Message: {Message}",
                 id,
-                response.StatusCode);
+                response.StatusCode,
+                message);
+            throw new ApiClientException(message);
         }
-        else
-        {
-            logger.LogInformation(
-                "Deleted transaction {TransactionId} through transactions API",
-                id);
-        }
+
+        logger.LogInformation(
+            "Deleted transaction {TransactionId} through transactions API",
+            id);
 
         return response.IsSuccessStatusCode;
     }

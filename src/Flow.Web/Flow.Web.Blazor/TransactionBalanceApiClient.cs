@@ -28,8 +28,20 @@ public class TransactionBalanceApiClient(
         if (query.Count > 0)
             url = QueryHelpers.AddQueryString(url, query);
 
-        var balances = await httpClient.GetFromJsonAsync<TransactionDailyBalance[]>(
-            url) ?? [];
+        var response = await httpClient.GetAsync(url);
+
+        if (!response.IsSuccessStatusCode)
+        {
+            var message = await ApiErrorReader.ReadMessageAsync(response);
+            logger.LogWarning(
+                "Failed to retrieve transaction daily balances. Status code: {StatusCode}. Message: {Message}",
+                response.StatusCode,
+                message);
+            throw new ApiClientException(message);
+        }
+
+        var balances = await response.Content.ReadFromJsonAsync<TransactionDailyBalance[]>()
+            ?? [];
         logger.LogInformation(
             "Retrieved {BalanceCount} transaction daily balances from reports API",
             balances.Length);

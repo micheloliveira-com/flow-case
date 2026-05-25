@@ -1,9 +1,6 @@
 @page "/transaction-daily-balance"
 @rendermode InteractiveServer
 
-@inject TransactionBalanceApiClient TransactionBalanceApi
-
-
 <h3 class="mb-4">Daily Balance</h3>
 <div class="d-flex gap-2 mb-3">
     <input class="form-control form-control-sm"
@@ -60,38 +57,4 @@ else
             </table>
         </div>
     </div>
-}
-
-@code {
-    private List<TransactionDailyBalance> dailyBalances = [];
-    private bool isLoading = true;
-    private string? errorMessage;
-
-    private DateOnly? filterStart;
-    private DateOnly? filterEnd;
-
-    protected override async Task OnInitializedAsync()
-    {
-        await Load();
-    }
-
-    private async Task Load()
-    {
-        try
-        {
-            isLoading = true;
-
-            dailyBalances = (await TransactionBalanceApi
-                .GetTransactionDailyBalancesAsync(filterStart, filterEnd))
-                .ToList();
-        }
-        catch (Exception ex)
-        {
-            errorMessage = ex.Message;
-        }
-        finally
-        {
-            isLoading = false;
-        }
-    }
 }
