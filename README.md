@@ -25,7 +25,9 @@ Veja as [Imagens do sistema](docs/image/images.md)
 
 ## Disclaimer
 
-O projeto segue boas práticas de arquitetura e design, mas evita a introdução de abstrações adicionais como formalização explícita de Unit of Work / repositórios genéricos, bem como o uso de DTOs tipados na camada de aplicação em substituição ao retorno direto de entidades, com o objetivo de reduzir complexidade e manter a solução mais simples, legível e adequada ao escopo do case.
+O projeto segue boas práticas de arquitetura e design, mas evita a introdução de abstrações adicionais, como a implementação completa de Unit of Work e repositórios genéricos, bem como o uso de DTOs tipados na camada de aplicação em substituição ao retorno direto de entidades, com o objetivo de reduzir complexidade e manter a solução simples, legível e adequada ao escopo do case.
+
+Inversão de controle (IoC) e a independência da camada de aplicação em relação à infraestrutura foram corretamente atingidos neste case, com aplicação efetiva de Dependency Injection e isolamento por meio de contratos (ports), garantindo desacoplamento dos detalhes de persistência e mensageria.
 
 ## Visão da arquitetura
 
