@@ -3,6 +3,11 @@ using Projects;
 
 var builder = DistributedApplication.CreateBuilder(args);
 
+var seq = builder.AddSeq("seq")
+    .ExcludeFromManifest()
+    .WithLifetime(ContainerLifetime.Persistent)
+    .WithEnvironment("ACCEPT_EULA", "Y");
+
 var username = builder.AddParameter("username", secret: true, value: "admin");
 var password = builder.AddParameter("password", secret: true, value: "admin");
 
@@ -27,6 +32,8 @@ var transactionsApiService = builder.AddProject<Projects.Flow_Transactions_ApiSe
     .WithReference(rabbitmq)
     .WaitFor(rabbitmq)
     .WithReference(transactionsApiDb)
+    .WithReference(seq)
+    .WaitFor(seq)
     .WithHttpHealthCheck("/health");
 
 var reportsApiService = builder.AddProject<Projects.Flow_Reports_ApiService>("reportsapiservice")
@@ -35,6 +42,8 @@ var reportsApiService = builder.AddProject<Projects.Flow_Reports_ApiService>("re
     .WithReference(rabbitmq)
     .WaitFor(rabbitmq)
     .WithReference(reportsApiDb)
+    .WithReference(seq)
+    .WaitFor(seq)
     .WithHttpHealthCheck("/health");
 
 builder.AddProject<Projects.Flow_Web_Blazor>("webfrontend")

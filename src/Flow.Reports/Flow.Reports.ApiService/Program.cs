@@ -38,6 +38,8 @@ builder.Services.AddAuthentication()
                 options.RequireHttpsMetadata = false;
             }
         });
+        
+builder.AddSeqEndpoint(connectionName: "seq");
 
 builder.AddNpgsqlDbContext<ReportsDbContext>("reportsapiservicedb");
 

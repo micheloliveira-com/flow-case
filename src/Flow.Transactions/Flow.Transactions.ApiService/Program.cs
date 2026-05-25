@@ -47,6 +47,8 @@ builder.Services.AddAuthentication()
             }
         });
 
+builder.AddSeqEndpoint(connectionName: "seq");
+
 builder.AddNpgsqlDbContext<TransactionDbContext>("transactionsapiservicedb");
 
 builder.Services.AddAuthorizationBuilder()
