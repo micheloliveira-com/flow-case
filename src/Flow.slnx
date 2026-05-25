@@ -13,4 +13,5 @@
   <Project Path="Flow.Shared/Flow.Shared.Application.Abstractions/Flow.Shared.Application.Abstractions.csproj" />
   <Project Path="Flow.Shared/Flow.Shared.Infrastructure.Abstractions/Flow.Shared.Infrastructure.Abstractions.csproj" />
   <Project Path="Flow.Reports/Flow.Reports.Tests/Flow.Reports.Tests.csproj" />
+  <Project Path="Flow.Transactions/Flow.Transactions.Tests/Flow.Transactions.Tests.csproj" />
 </Solution>
