@@ -3,79 +3,86 @@
 Este diagrama apresenta os principais componentes internos dos microsserviços `Transactions` e `Reports`, seguindo Clean Architecture, use cases explícitos e separação entre domínio, aplicação, infraestrutura e API.
 
 ```mermaid
-flowchart TB
-    subgraph Transactions["Flow.Transactions"]
-        TransactionsEndpoints["Minimal API Endpoints<br/>/transactions"]
-        CreateUseCase["CreateTransactionService"]
-        UpdateUseCase["UpdateTransactionService"]
-        DeleteUseCase["DeleteTransactionService"]
-        GetUseCase["GetTransactionsService"]
-        RecomputeUseCase["ExecuteTransactionDailyRecomputeService"]
+C4Component
+    title Flow - Components
 
-        TransactionDomain["Transaction<br/>Entidade de domínio"]
-        TransactionRepository["TransactionRepository<br/>EF Core"]
-        RecomputePublisher["TransactionDailyRecomputePublisher"]
-        BalancePublisher["TransactionDailyBalancePublisher"]
-        RecomputeConsumer["TransactionDailyRecomputeConsumer"]
-        RecomputeWorker["TransactionDailyRecomputeWorker"]
-    end
+    Person(user, "Usuário")
 
-    subgraph Reports["Flow.Reports"]
-        ReportsEndpoints["Minimal API Endpoint<br/>/transaction_daily_balance"]
-        GetBalanceUseCase["GetTransactionDailyBalance"]
-        ExecuteBalanceUseCase["ExecuteTransactionDailyBalanceService"]
+    System_Boundary(txs, "Flow.Transactions") {
 
-        BalanceDomain["TransactionDailyBalance<br/>Entidade de domínio"]
-        BalanceRepository["TransactionDailyBalanceRepository<br/>EF Core"]
-        BalanceConsumer["TransactionDailyBalanceConsumer"]
-        BalanceWorker["TransactionDailyBalanceWorker"]
-    end
+        Container(transactionsApi, "Transactions API", "ASP.NET Core", "Minimal API")
 
-    SharedContracts["Flow.Shared.Application.Abstractions<br/>TransactionDailyBalanceMessage"]
-    SharedMessaging["Flow.Shared.Infrastructure.Abstractions<br/>IMessageConsumer / RabbitMqConsumer"]
-    RabbitMQ["RabbitMQ"]
-    TransactionsDb[("Transactions DB")]
-    ReportsDb[("Reports DB")]
+        Component(endpoints, "Transaction Endpoints", "Minimal API", "/transactions")
 
-    TransactionsEndpoints --> CreateUseCase
-    TransactionsEndpoints --> UpdateUseCase
-    TransactionsEndpoints --> DeleteUseCase
-    TransactionsEndpoints --> GetUseCase
+        Component(create, "CreateTransactionService", "Application Service", "Criação")
+        Component(update, "UpdateTransactionService", "Application Service", "Atualização")
+        Component(delete, "DeleteTransactionService", "Application Service", "Remoção")
+        Component(get, "GetTransactionsService", "Application Service", "Consulta")
 
-    CreateUseCase --> TransactionDomain
-    UpdateUseCase --> TransactionDomain
-    CreateUseCase --> TransactionRepository
-    UpdateUseCase --> TransactionRepository
-    DeleteUseCase --> TransactionRepository
-    GetUseCase --> TransactionRepository
-    TransactionRepository --> TransactionsDb
+        Component(recompute, "ExecuteTransactionDailyRecomputeService", "Application Service", "Recompute diário")
 
-    CreateUseCase --> RecomputePublisher
-    UpdateUseCase --> RecomputePublisher
-    DeleteUseCase --> RecomputePublisher
-    RecomputePublisher --> RabbitMQ
+        Component(domain, "Transaction", "Domain Entity", "Agregado raiz")
+        Component(repo, "TransactionRepository", "EF Core", "Persistência")
 
-    RabbitMQ --> RecomputeConsumer
-    RecomputeConsumer --> RecomputeWorker
-    RecomputeWorker --> RecomputeUseCase
-    RecomputeUseCase --> TransactionRepository
-    RecomputeUseCase --> BalancePublisher
-    BalancePublisher --> SharedContracts
-    BalancePublisher --> RabbitMQ
+        Component(recomputePub, "TransactionDailyRecomputePublisher", "Messaging", "Publica evento")
+        Component(balancePub, "TransactionDailyBalancePublisher", "Messaging", "Publica balance")
 
-    ReportsEndpoints --> GetBalanceUseCase
-    GetBalanceUseCase --> BalanceRepository
-    BalanceRepository --> ReportsDb
+        Component(recomputeWorker, "TransactionDailyRecomputeWorker", "Worker", "Processamento assíncrono")
+        Component(recomputeConsumer, "TransactionDailyRecomputeConsumer", "Messaging", "Consumer")
+    }
 
-    RabbitMQ --> BalanceConsumer
-    BalanceConsumer --> BalanceWorker
-    BalanceWorker --> ExecuteBalanceUseCase
-    ExecuteBalanceUseCase --> SharedContracts
-    ExecuteBalanceUseCase --> BalanceDomain
-    ExecuteBalanceUseCase --> BalanceRepository
+    System_Boundary(rep, "Flow.Reports") {
 
-    RecomputeConsumer --> SharedMessaging
-    BalanceConsumer --> SharedMessaging
+        Container(reportsApi, "Reports API", "ASP.NET Core", "Minimal API")
+
+        Component(getBalance, "GetTransactionDailyBalance", "Application Service", "Consulta saldo diário")
+        Component(execBalance, "ExecuteTransactionDailyBalanceService", "Application Service", "Processamento")
+
+        Component(balanceDomain, "TransactionDailyBalance", "Domain Entity", "Projeção")
+        Component(balanceRepo, "TransactionDailyBalanceRepository", "EF Core", "Persistência")
+
+        Component(balanceWorker, "TransactionDailyBalanceWorker", "Worker", "Processamento assíncrono")
+        Component(balanceConsumer, "TransactionDailyBalanceConsumer", "Messaging", "Consumer")
+    }
+
+    System_Ext(rabbitmq, "RabbitMQ", "Message Broker")
+    SystemDb(txsDb, "Transactions DB", "PostgreSQL")
+    SystemDb(repDb, "Reports DB", "PostgreSQL")
+
+    Rel(endpoints, create, "calls")
+    Rel(endpoints, update, "calls")
+    Rel(endpoints, delete, "calls")
+    Rel(endpoints, get, "calls")
+
+    Rel(create, domain, "uses")
+    Rel(update, domain, "uses")
+    Rel(delete, domain, "uses")
+    Rel(get, repo, "reads")
+    Rel(repo, txsDb, "EF Core")
+
+    Rel(create, recomputePub, "publishes")
+    Rel(update, recomputePub, "publishes")
+    Rel(delete, recomputePub, "publishes")
+
+    Rel(recomputePub, rabbitmq, "events")
+
+    Rel(rabbitmq, recomputeConsumer, "consumes")
+    Rel(recomputeConsumer, recomputeWorker, "runs")
+    Rel(recomputeWorker, recompute, "executes")
+
+    Rel(recompute, repo, "reads/writes")
+    Rel(recompute, balancePub, "publishes")
+    Rel(balancePub, rabbitmq, "events")
+
+    Rel(getBalance, balanceRepo, "reads")
+    Rel(balanceRepo, repDb, "EF Core")
+
+    Rel(rabbitmq, balanceConsumer, "consumes")
+    Rel(balanceConsumer, balanceWorker, "runs")
+    Rel(balanceWorker, execBalance, "executes")
+
+    Rel(execBalance, balanceDomain, "updates")
+    Rel(execBalance, balanceRepo, "persists")
 ```
 
 ## Leitura arquitetural
