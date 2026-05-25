@@ -21,8 +21,8 @@ public class TransactionDailyBalance
 
     public void Apply(decimal balance, DateTime processedAt)
     {
-        SetBalance(balance);
         SetProcessedAt(processedAt);
+        SetBalance(balance);
     }
 
     private static void Guard(bool condition, string message)
