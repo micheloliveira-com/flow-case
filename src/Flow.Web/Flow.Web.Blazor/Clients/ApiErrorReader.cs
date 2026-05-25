@@ -1,7 +1,7 @@
 using System.Text.Json;
 using Microsoft.AspNetCore.Mvc;
 
-namespace Flow.Web.Blazor;
+namespace Flow.Web.Blazor.Clients;
 
 internal static class ApiErrorReader
 {

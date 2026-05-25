@@ -1,11 +1,9 @@
-
-
 using System.Net.Http.Json;
 using Microsoft.AspNetCore.WebUtilities;
 using System.Globalization;
 using Microsoft.Extensions.Logging;
 
-namespace Flow.Web.Blazor;
+namespace Flow.Web.Blazor.Clients;
 
 public class TransactionBalanceApiClient(
     HttpClient httpClient,

@@ -1,8 +1,7 @@
-
-namespace Flow.Web.Blazor;
-
 using Microsoft.AspNetCore.WebUtilities;
 using Microsoft.Extensions.Logging;
+
+namespace Flow.Web.Blazor.Clients;
 
 public class TransactionApiClient(
     HttpClient httpClient,

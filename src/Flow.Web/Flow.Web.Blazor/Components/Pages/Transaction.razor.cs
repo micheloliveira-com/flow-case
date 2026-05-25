@@ -1,7 +1,6 @@
 using Microsoft.AspNetCore.Components;
 using Microsoft.JSInterop;
-using Flow.Web.Blazor;
-using Blazor = Flow.Web.Blazor;
+using Flow.Web.Blazor.Clients;
 
 namespace Flow.Web.Blazor.Components.Pages;
 
@@ -13,7 +12,7 @@ public partial class Transaction
     [Inject]
     private IJSRuntime JS { get; set; } = default!;
 
-    private Blazor.Transaction[]? transactions;
+    private Flow.Web.Blazor.Clients.Transaction[]? transactions;
     private bool isLoading = true;
     private string? errorMessage;
 
@@ -56,7 +55,7 @@ public partial class Transaction
         formModel = CreateDefaultFormModel();
     }
 
-    private void StartEdit(Blazor.Transaction tx)
+    private void StartEdit(Flow.Web.Blazor.Clients.Transaction tx)
     {
         isModalOpen = true;
         isEditing = true;
@@ -84,7 +83,7 @@ public partial class Transaction
 
         try
         {
-            var input = new Blazor.Transaction(
+            var input = new Flow.Web.Blazor.Clients.Transaction(
                 formModel.Id,
                 formModel.Amount,
                 formModel.Type,

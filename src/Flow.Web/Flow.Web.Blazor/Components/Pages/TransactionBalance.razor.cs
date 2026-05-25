@@ -1,5 +1,5 @@
 using Microsoft.AspNetCore.Components;
-using Flow.Web.Blazor;
+using Flow.Web.Blazor.Clients;
 
 namespace Flow.Web.Blazor.Components.Pages;
 
