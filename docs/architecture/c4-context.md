@@ -3,24 +3,27 @@
 Este diagrama apresenta a solução no nível de contexto, mostrando o usuário, o sistema Flow e as principais dependências de plataforma usadas para autenticação, mensageria, persistência e orquestração local.
 
 ```mermaid
-flowchart LR
-    User["Usuário autenticado<br/>Operador do fluxo de caixa"]
+C4Context
+    title Flow - Contexto do Sistema
 
-    Flow["Flow<br/>Sistema de controle de lançamentos<br/>e saldo diário consolidado"]
+    Person(user, "Usuário autenticado", "Operador do fluxo de caixa")
 
-    Keycloak["Keycloak<br/>Provedor de identidade OIDC/JWT"]
-    RabbitMQ["RabbitMQ<br/>Broker de mensagens"]
-    Postgres["PostgreSQL<br/>Persistência transacional e projeções"]
-    Aspire[".NET Aspire AppHost<br/>Orquestração local, service discovery,<br/>health checks e observabilidade"]
+    System(flow, "Flow", "Sistema de controle de lançamentos e saldo diário consolidado")
 
-    User -->|"Acessa interface web"| Flow
-    Flow -->|"Autentica usuário e valida tokens"| Keycloak
-    Flow -->|"Publica e consome eventos"| RabbitMQ
-    Flow -->|"Persiste dados por contexto"| Postgres
-    Aspire -->|"Provisiona e integra recursos locais"| Flow
-    Aspire -->|"Provisiona recursos locais"| Keycloak
-    Aspire -->|"Provisiona recursos locais"| RabbitMQ
-    Aspire -->|"Provisiona recursos locais"| Postgres
+    System_Ext(keycloak, "Keycloak", "Provedor de identidade OIDC/JWT")
+    System_Ext(rabbitmq, "RabbitMQ", "Broker de mensagens")
+    SystemDb(postgres, "PostgreSQL", "Persistência transacional e projeções")
+    System_Ext(aspire, ".NET Aspire AppHost", "Orquestração local, service discovery, health checks e observabilidade")
+
+    Rel(user, flow, "Acessa interface web")
+    Rel(flow, keycloak, "Autentica usuário e valida tokens")
+    Rel(flow, rabbitmq, "Publica e consome eventos")
+    Rel(flow, postgres, "Persiste dados por contexto")
+
+    Rel(aspire, flow, "Provisiona e integra recursos locais")
+    Rel(aspire, keycloak, "Provisiona recursos locais")
+    Rel(aspire, rabbitmq, "Provisiona recursos locais")
+    Rel(aspire, postgres, "Provisiona recursos locais")
 ```
 
 ## Observações
