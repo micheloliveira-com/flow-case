@@ -3,8 +3,6 @@ using Flow.Transactions.Application.Abstractions.Messaging.TransactionDailyBalan
 using Flow.Transactions.Application.Abstractions.Messaging.TransactionDailyRecompute;
 using Flow.Transactions.Application.Abstractions.Persistence;
 using Flow.Transactions.Application.UseCases.DailyRecompute.ExecuteTransactionDailyRecompute;
-using Flow.Transactions.Domain.Entities;
-using Flow.Transactions.Domain.Entities.Enums;
 using Microsoft.Extensions.Logging.Abstractions;
 using Moq;
 
@@ -17,19 +15,13 @@ public sealed class ExecuteTransactionDailyRecomputeServiceTests
     {
         // Arrange
         var date = new DateOnly(2026, 5, 24);
-        var transactions = new List<Transaction>
-        {
-            new(100m, TransactionType.Credit, date, "Salary"),
-            new(25m, TransactionType.Debit, date, "Lunch"),
-            new(10m, TransactionType.Credit, date, "Cashback")
-        };
 
         var repository = new Mock<ITransactionRepository>(MockBehavior.Strict);
         var publisher = new Mock<ITransactionDailyBalancePublisher>(MockBehavior.Strict);
 
         repository
-            .Setup(x => x.GetByDateAsync(date))
-            .ReturnsAsync(transactions)
+            .Setup(x => x.GetDailyBalanceAsync(date))
+            .ReturnsAsync(85m)
             .Verifiable();
 
         publisher
@@ -65,8 +57,8 @@ public sealed class ExecuteTransactionDailyRecomputeServiceTests
         var publisher = new Mock<ITransactionDailyBalancePublisher>(MockBehavior.Strict);
 
         repository
-            .Setup(x => x.GetByDateAsync(date))
-            .ReturnsAsync([])
+            .Setup(x => x.GetDailyBalanceAsync(date))
+            .ReturnsAsync(0m)
             .Verifiable();
 
         publisher

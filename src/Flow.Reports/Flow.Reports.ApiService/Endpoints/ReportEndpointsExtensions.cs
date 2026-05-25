@@ -9,7 +9,7 @@ public static class ReportEndpointsExtensions
         endpoints.MapGet("/", () => "Reports API is running.");
 
         endpoints.MapGet("/transaction_daily_balance", async (
-            IGetTransactionDailyBalance service,
+            IGetTransactionDailyBalanceService service,
             [AsParameters] GetTransactionDailyBalanceRequest request) =>
         {
             return await service.ExecuteAsync(request);

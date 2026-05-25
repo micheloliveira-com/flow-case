@@ -59,25 +59,26 @@ public sealed class TransactionRepositoryTests
     }
 
     [Fact]
-    public async Task GetByDateAsync_ShouldReturnOnlyTransactionsFromDate()
+    public async Task GetDailyBalanceAsync_ShouldReturnCreditMinusDebitBalanceFromDate()
     {
         // Arrange
         await using var db = CreateDbContext();
         var expectedDate = new DateOnly(2026, 5, 24);
+
         await SeedAsync(
             db,
-            CreateTransaction(expectedDate, 100m),
-            CreateTransaction(expectedDate, 200m),
-            CreateTransaction(new DateOnly(2026, 5, 23), 300m));
+            CreateTransaction(expectedDate, 300m, TransactionType.Credit),
+            CreateTransaction(expectedDate, 100m, TransactionType.Debit),
+            CreateTransaction(expectedDate, 50m, TransactionType.Debit),
+            CreateTransaction(new DateOnly(2026, 5, 23), 999m, TransactionType.Credit));
 
         var repository = new TransactionRepository(db);
 
         // Act
-        var actual = await repository.GetByDateAsync(expectedDate);
+        var actual = await repository.GetDailyBalanceAsync(expectedDate);
 
         // Assert
-        Assert.Equal(2, actual.Count);
-        Assert.All(actual, item => Assert.Equal(expectedDate, item.Date));
+        Assert.Equal(150m, actual);
     }
 
     [Fact]
@@ -147,20 +148,22 @@ public sealed class TransactionRepositoryTests
 
     private static Transaction CreateTransaction(
         DateOnly date,
-        decimal amount)
+        decimal amount,
+        TransactionType type = TransactionType.Credit)
     {
-        return CreateTransaction(Guid.NewGuid(), date, amount);
+        return CreateTransaction(Guid.NewGuid(), date, amount, type);
     }
 
     private static Transaction CreateTransaction(
         Guid id,
         DateOnly date,
-        decimal amount)
+        decimal amount,
+        TransactionType type = TransactionType.Credit)
     {
         return new Transaction(
             id,
             amount,
-            TransactionType.Credit,
+            type,
             date,
             "Salary");
     }

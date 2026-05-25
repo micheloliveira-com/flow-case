@@ -3,6 +3,7 @@ using Microsoft.EntityFrameworkCore;
 using Flow.Transactions.Application.Abstractions.Persistence;
 using Flow.Transactions.Infrastructure.Persistence;
 using Flow.Transactions.Domain.Entities;
+using Flow.Transactions.Domain.Entities.Enums;
 
 namespace Flow.Transactions.Infrastructure.Persistence.Repositories;
 public sealed class TransactionRepository(
@@ -26,12 +27,15 @@ public sealed class TransactionRepository(
         return await query.OrderByDescending(x => x.Date).ToListAsync();
     }
 
-    public async Task<List<Transaction>> GetByDateAsync(DateOnly date)
+    public async Task<decimal> GetDailyBalanceAsync(DateOnly date)
     {
         return await db.Transactions
             .AsNoTracking()
             .Where(x => x.Date == date)
-            .ToListAsync();
+            .SumAsync(x =>
+                x.Type == TransactionType.Credit
+                    ? x.Amount
+                    : -x.Amount);
     }
 
     public async Task AddAsync(Transaction transaction)
