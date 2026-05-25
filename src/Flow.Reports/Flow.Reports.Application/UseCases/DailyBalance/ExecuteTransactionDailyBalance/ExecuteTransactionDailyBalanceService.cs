@@ -21,22 +21,34 @@ public sealed class ExecuteTransactionDailyBalanceService(
             return;
         }
 
-        if (current is null)
-        {
-            current = CreateTransactionDailyBalance(message);
-
-            await repository.AddAsync(current);
-
-            LogTransactionDailyBalanceCreated(message);
-        }
-        else
-        {
-            UpdateTransactionDailyBalance(current, message);
-
-            LogTransactionDailyBalanceUpdated(message);
-        }
+        await PersistTransactionDailyBalanceAsync(message, current);
 
         await repository.SaveChangesAsync();
+    }
+
+    private async Task PersistTransactionDailyBalanceAsync(
+        TransactionDailyBalanceMessage message,
+        Domain.Entities.TransactionDailyBalance? current)
+    {
+        if (current is null)
+        {
+            await CreateTransactionDailyBalanceAsync(message);
+            return;
+        }
+
+        UpdateTransactionDailyBalance(current, message);
+
+        LogTransactionDailyBalanceUpdated(message);
+    }
+
+    private async Task CreateTransactionDailyBalanceAsync(
+        TransactionDailyBalanceMessage message)
+    {
+        var transactionDailyBalance = CreateTransactionDailyBalance(message);
+
+        await repository.AddAsync(transactionDailyBalance);
+
+        LogTransactionDailyBalanceCreated(message);
     }
 
     private static bool ShouldIgnore(
