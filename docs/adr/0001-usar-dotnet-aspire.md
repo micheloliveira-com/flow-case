@@ -22,6 +22,7 @@ O AppHost provisiona:
 - PostgreSQL para Transactions
 - PostgreSQL para Reports
 - pgAdmin
+- Seq para logs estruturados
 
 Redis não foi incluído nesta versão porque o requisito informado para o consolidado diário é de 50 requisições por segundo. Para esse volume, a projeção materializada no banco de relatórios, combinada com processamento assíncrono via RabbitMQ, atende ao objetivo sem adicionar complexidade operacional desnecessária.
 

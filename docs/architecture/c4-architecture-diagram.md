@@ -2,9 +2,9 @@
 
 ## Visão geral
 
-O sistema **Flow** é uma plataforma distribuída para controle de lançamentos financeiros e consolidação de saldo diário. Ele foi desenhado com separação clara entre interface, serviços de domínio, persistência e processamento assíncrono baseado em eventos.
+O sistema **Flow** é uma plataforma distribuída para controle de lançamentos financeiros e consolidação de saldo diário. Ele foi desenhado com separação clara entre interface, serviços de domínio, persistência, processamento assíncrono baseado em eventos e observabilidade.
 
-A arquitetura segue um modelo orientado a eventos, com processamento desacoplado via mensageria e projeções materializadas para consultas.
+A arquitetura segue um modelo orientado a eventos, com processamento desacoplado via mensageria, projeções materializadas para consultas e logs estruturados centralizados em Seq durante a execução.
 
 ---
 
@@ -33,6 +33,7 @@ workspace "Flow" "Distributed transaction system" {
 
         keycloak = softwareSystem "Keycloak"
         rabbitmq = softwareSystem "RabbitMQ"
+        seq = softwareSystem "Seq"
 
         flow = softwareSystem "Flow" {
 
@@ -60,6 +61,9 @@ workspace "Flow" "Distributed transaction system" {
 
         transactionsApi -> rabbitmq "Eventos"
         reportsApi -> rabbitmq "Eventos"
+
+        transactionsApi -> seq "Logs estruturados"
+        reportsApi -> seq "Logs estruturados"
     }
 
     views {
@@ -89,10 +93,11 @@ workspace "Flow" "Distributed transaction system" {
 
 O usuário autenticado interage com o sistema Flow através de uma aplicação web Blazor. Todas as operações passam por autenticação centralizada via Keycloak utilizando OIDC/JWT.
 
-O sistema depende de dois componentes externos principais:
+O sistema depende de três componentes externos principais:
 
 - **Keycloak**: responsável por autenticação e autorização.
 - **RabbitMQ**: utilizado como broker para comunicação assíncrona entre serviços.
+- **Seq**: utilizado para consulta centralizada de logs estruturados no ambiente.
 
 O PostgreSQL é utilizado como persistência principal, separada por contexto.
 
@@ -115,6 +120,9 @@ Armazena dados transacionais.
 ### Reports DB
 Armazena projeções de leitura.
 
+### Seq
+Centraliza logs estruturados emitidos pelas APIs durante a execução pelo AppHost Aspire.
+
 ---
 
 ## Fluxo de comunicação
@@ -125,6 +133,7 @@ Armazena projeções de leitura.
 4. Transactions API persiste dados e publica eventos.
 5. Reports API consome eventos e atualiza projeções.
 6. Consultas são realizadas no Reports DB.
+7. Transactions API e Reports API enviam logs estruturados para o Seq.
 
 ---
 
@@ -135,3 +144,4 @@ Armazena projeções de leitura.
 - Comunicação assíncrona via RabbitMQ.
 - Bancos separados por contexto.
 - Consistência eventual nas projeções.
+- Observabilidade com logs estruturados no Seq.

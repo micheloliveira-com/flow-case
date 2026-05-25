@@ -15,6 +15,7 @@ Este projeto é de autoria de [micheloliveira-com](https://github.com/micheloliv
 - Independência operacional entre o serviço de lançamentos e o serviço de relatórios.
 - Integração assíncrona via RabbitMQ para reduzir acoplamento e preservar disponibilidade.
 - Orquestração local com .NET Aspire, incluindo containers, service discovery, health checks, logs e observabilidade.
+- Centralização de logs estruturados em Seq durante a execução.
 - Autenticação com Keycloak e OIDC.
 - Persistência separada por contexto usando PostgreSQL.
 - Testes automatizados para domínio, aplicação e infraestrutura.
@@ -76,16 +77,24 @@ flowchart TD
         RabbitMQ --> ReportsWorker
         ReportsWorker --> ReportsDb
     end
+
+    subgraph OBS[Observability Layer]
+        Seq[Seq]
+
+        TransactionsApi --> Seq
+        ReportsApi --> Seq
+    end
 ```
 
 ## Componentes
 
 | Componente | Responsabilidade |
 | --- | --- |
-| `Flow.Aspire.AppHost` | Orquestra a aplicação distribuída localmente com Aspire. Sobe Web, APIs, RabbitMQ, Keycloak e PostgreSQL. |
+| `Flow.Aspire.AppHost` | Orquestra a aplicação distribuída localmente com Aspire. Sobe Web, APIs, RabbitMQ, Keycloak, PostgreSQL, pgAdmin e Seq. |
 | `Flow.Web.Blazor` | Interface web para lançamentos e consulta de saldo diário. |
 | `Flow.Transactions.ApiService` | API de controle de lançamentos. Expõe CRUD de transações e publica eventos de recomputação diária. |
 | `Flow.Reports.ApiService` | API de relatórios. Consulta o saldo diário consolidado materializado. |
+| `Seq` | Centraliza logs estruturados das APIs durante a execução pelo AppHost Aspire. |
 | `Flow.Transactions.*` | Camadas de domínio, aplicação, infraestrutura e testes do contexto de lançamentos. |
 | `Flow.Reports.*` | Camadas de domínio, aplicação, infraestrutura e testes do contexto de relatórios. |
 | `Flow.Shared.*` | Contratos e abstrações compartilhadas entre os serviços. |
@@ -106,6 +115,7 @@ Este repositório contém as decisões arquiteturais do projeto.
 | [ADR-0004](docs/adr/0004-clean-architecture-ddd-e-use-cases.md) | Organizar os contextos com Clean Architecture, DDD tático e use cases | Aceita |
 | [ADR-0005](docs/adr/0005-persistencia-separada-por-servico.md) | Manter persistência separada por serviço | Aceita |
 | [ADR-0006](docs/adr/0006-keycloak-oidc-jwt.md) | Usar Keycloak, OIDC e JWT para autenticação | Aceita |
+| [ADR-0007](docs/adr/0007-observabilidade-local-com-seq.md) | Usar Seq para logs estruturados no ambiente | Aceita |
 
 ## Fluxo funcional
 
@@ -131,7 +141,7 @@ Esse desenho evita que a indisponibilidade temporária do consolidado diário bl
 
 - O serviço de lançamentos continua operando mesmo que o serviço de relatórios esteja indisponível.
 - Consumidores usam confirmação manual (`ack`) e reprocessamento com `nack` em caso de falha.
-- Health checks e dashboard Aspire facilitam diagnóstico local.
+- Health checks, dashboard Aspire e logs estruturados no Seq facilitam diagnóstico.
 - Cada serviço possui seu próprio banco, reduzindo acoplamento operacional.
 
 ### Segurança
@@ -178,7 +188,7 @@ src/
 - .NET SDK compatível com `net10.0`.
 - Docker Desktop ou runtime Docker equivalente.
 - Git.
-- Portas locais livres para os recursos do Aspire, incluindo Keycloak, RabbitMQ, PostgreSQL e aplicações web.
+- Portas locais livres para os recursos do Aspire, incluindo Keycloak, RabbitMQ, PostgreSQL, Seq e aplicações web.
 
 ## Como executar localmente
 
@@ -199,7 +209,7 @@ Ao iniciar, o Aspire exibirá no terminal a URL do dashboard. Pelo dashboard é 
 - `webfrontend`: aplicação Blazor.
 - `transactionsapiservice`: API de lançamentos.
 - `reportsapiservice`: API de relatórios.
-- Keycloak, RabbitMQ, PostgreSQL e pgAdmin.
+- Keycloak, RabbitMQ, PostgreSQL, pgAdmin e Seq.
 
 O AppHost também executa as migrations dos bancos automaticamente na inicialização das APIs.
 
@@ -300,13 +310,22 @@ Os testes de `Transactions` e `Reports` cobrem regras de domínio, casos de uso,
 
 ## Observabilidade e operação
 
-O projeto usa os `ServiceDefaults` do Aspire para configurar endpoints padrão, health checks, logs e integração com o dashboard. Durante a execução local, o dashboard centraliza:
+O projeto usa os `ServiceDefaults` do Aspire para configurar endpoints padrão, health checks, logs e integração com o dashboard. Além disso, o AppHost provisiona um recurso `seq` para centralizar logs estruturados das APIs.
+
+Durante a execução local, o dashboard do Aspire centraliza:
 
 - Status dos recursos.
 - Logs por serviço.
 - Endpoints HTTP.
 - Variáveis e conexões provisionadas pelo Aspire.
 - Dependências entre recursos.
+
+O Seq aparece como um recurso no dashboard do Aspire. Pelo endpoint exposto ali é possível abrir a interface do Seq e consultar eventos de log emitidos por:
+
+- `transactionsapiservice`
+- `reportsapiservice`
+
+As APIs se conectam ao recurso por meio de `builder.AddSeqEndpoint(connectionName: "seq")`. No AppHost, o Seq é configurado com lifetime persistente para preservar dados locais entre execuções e com `ExcludeFromManifest`, pois a integração atual foi pensada para a experiência do case técnico. Em produção, a estratégia de observabilidade deveria ser definida explicitamente no ambiente de deploy, incluindo retenção, segurança, volume esperado, dashboards e alertas.
 
 ## Evoluções recomendadas para produção
 
@@ -315,6 +334,7 @@ O projeto usa os `ServiceDefaults` do Aspire para configurar endpoints padrão, 
 - Definir `prefetch`, concorrência de consumidores e particionamento por data para suportar picos controlados.
 - Adicionar testes de carga para validar 50 requisições por segundo no consolidado diário e medir perda, latência e atraso de fila.
 - Adicionar métricas de negócio e operação: quantidade de lançamentos por minuto, lag da fila, falhas de consumo, tempo de consolidação e disponibilidade por serviço.
+- Definir política de observabilidade produtiva para logs estruturados, métricas, traces, retenção e alertas.
 - Externalizar secrets com cofre de segredos.
 - Separar configurações de desenvolvimento, homologação e produção.
 - Aplicar políticas mais granulares de autorização por role/scope.
