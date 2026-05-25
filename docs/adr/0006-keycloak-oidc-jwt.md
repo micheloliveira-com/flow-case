@@ -12,9 +12,10 @@ O case técnico menciona segurança como requisito não funcional. A solução p
 
 Usar Keycloak como provedor de identidade, integrado ao .NET Aspire.
 
-- O frontend Blazor autentica usuários via OpenID Connect.
-- As APIs validam tokens JWT Bearer emitidos pelo Keycloak.
 - O realm `flow` é importado automaticamente pelo AppHost.
+- O frontend Blazor autentica usuários via OpenID Connect.
+- O cliente OIDC do frontend utiliza ClientId `flow.web` e escopo `flow:all`.
+- As APIs validam tokens JWT Bearer emitidos pelo Keycloak.
 - A política padrão das APIs exige usuário autenticado.
 - Cada API valida o claim de audience do JWT de forma específica: `flow.transactions.api` para a Transactions API e `flow.reports.api` para a Reports API.
 
