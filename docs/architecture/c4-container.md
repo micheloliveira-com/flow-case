@@ -3,50 +3,63 @@
 Este diagrama apresenta os containers da solução, incluindo frontend, APIs, workers, bancos de dados e broker de mensagens.
 
 ```mermaid
-flowchart LR
-    User["Usuário"]
+C4Container
+    title Flow - Containers
 
-    subgraph Flow["Flow"]
-        Web["Flow.Web.Blazor<br/>Frontend Blazor Server<br/>Login OIDC e interface mínima"]
+    Person(user, "Usuário")
 
-        TransactionsApi["Flow.Transactions.ApiService<br/>API de lançamentos<br/>CRUD e publicação de recomputação"]
-        TransactionsWorker["TransactionDailyRecomputeWorker<br/>Worker de recomputação diária"]
+    System_Boundary(flow, "Flow") {
 
-        ReportsApi["Flow.Reports.ApiService<br/>API de relatórios<br/>Consulta de saldo diário"]
-        ReportsWorker["TransactionDailyBalanceWorker<br/>Worker de consolidação diária"]
-    end
+        Container(web, "Flow.Web.Blazor", "Blazor Server",
+            "Frontend Blazor Server com login OIDC e interface")
 
-    Keycloak["Keycloak<br/>OIDC/JWT"]
-    RabbitMQ["RabbitMQ<br/>Filas duráveis"]
-    TransactionsDb[("PostgreSQL<br/>transactionsapiservicedb")]
-    ReportsDb[("PostgreSQL<br/>reportsapiservicedb")]
-    Aspire[".NET Aspire AppHost<br/>Orquestração local"]
+        Container(transactionsApi, "Flow.Transactions.ApiService", "ASP.NET Core",
+            "API de lançamentos (CRUD + eventos de recomputação)")
 
-    User -->|"HTTPS / Browser"| Web
-    Web -->|"OIDC login"| Keycloak
-    Web -->|"HTTP + Bearer token"| TransactionsApi
-    Web -->|"HTTP + Bearer token"| ReportsApi
+        Container(transactionsWorker, "TransactionDailyRecomputeWorker", "Worker Service",
+            "Processamento assíncrono de recomputação diária")
 
-    TransactionsApi -->|"Valida JWT"| Keycloak
-    ReportsApi -->|"Valida JWT"| Keycloak
+        Container(reportsApi, "Flow.Reports.ApiService", "ASP.NET Core",
+            "API de relatórios e consultas de saldo diário")
 
-    TransactionsApi -->|"EF Core"| TransactionsDb
-    ReportsApi -->|"EF Core"| ReportsDb
+        Container(reportsWorker, "TransactionDailyBalanceWorker", "Worker Service",
+            "Consolidação diária de projeções")
+    }
 
-    TransactionsApi -->|"Publica<br/>transaction-daily-recompute"| RabbitMQ
-    RabbitMQ -->|"Consome<br/>transaction-daily-recompute"| TransactionsWorker
-    TransactionsWorker -->|"Consulta lançamentos do dia"| TransactionsDb
-    TransactionsWorker -->|"Publica<br/>transaction-daily-balance"| RabbitMQ
-    RabbitMQ -->|"Consome<br/>transaction-daily-balance"| ReportsWorker
-    ReportsWorker -->|"Atualiza projeção diária"| ReportsDb
+    System_Ext(keycloak, "Keycloak", "OIDC / JWT Provider")
+    System_Ext(rabbitmq, "RabbitMQ", "Message Broker")
+    SystemDb(transactionsDb, "PostgreSQL (transactionsapiservicedb)", "Persistência de lançamentos")
+    SystemDb(reportsDb, "PostgreSQL (reportsapiservicedb)", "Persistência de projeções")
+    System_Ext(aspire, ".NET Aspire AppHost", "Orquestração local")
 
-    Aspire -.-> Web
-    Aspire -.-> TransactionsApi
-    Aspire -.-> ReportsApi
-    Aspire -.-> Keycloak
-    Aspire -.-> RabbitMQ
-    Aspire -.-> TransactionsDb
-    Aspire -.-> ReportsDb
+    Rel(user, web, "Usa via browser")
+
+    Rel(web, keycloak, "Login OIDC")
+    Rel(web, transactionsApi, "HTTP + Bearer token")
+    Rel(web, reportsApi, "HTTP + Bearer token")
+
+    Rel(transactionsApi, keycloak, "Valida JWT")
+    Rel(reportsApi, keycloak, "Valida JWT")
+
+    Rel(transactionsApi, transactionsDb, "EF Core")
+    Rel(reportsApi, reportsDb, "EF Core")
+
+    Rel(transactionsApi, rabbitmq, "Publica transaction-daily-recompute")
+    Rel(rabbitmq, transactionsWorker, "Consome recompute")
+
+    Rel(transactionsWorker, transactionsDb, "Consulta lançamentos do dia")
+    Rel(transactionsWorker, rabbitmq, "Publica transaction-daily-balance")
+
+    Rel(rabbitmq, reportsWorker, "Consome balance events")
+    Rel(reportsWorker, reportsDb, "Atualiza projeções")
+
+    Rel(aspire, web, "Orquestra")
+    Rel(aspire, transactionsApi, "Orquestra")
+    Rel(aspire, reportsApi, "Orquestra")
+    Rel(aspire, keycloak, "Orquestra")
+    Rel(aspire, rabbitmq, "Orquestra")
+    Rel(aspire, transactionsDb, "Orquestra")
+    Rel(aspire, reportsDb, "Orquestra")
 ```
 
 ## Decisões representadas
