@@ -51,4 +51,4 @@ Para produção, a decisão deve ser complementada com:
 
 - Chamada HTTP síncrona entre serviços: mais simples, mas violaria o isolamento de disponibilidade.
 - Banco compartilhado: reduziria integração, mas aumentaria acoplamento e quebraria autonomia dos serviços.
-- Kafka: robusto para alto volume e stream processing, mas RabbitMQ é suficiente e mais simples para o escopo do desafio.
+- Kafka: robusto para alto volume e stream processing, mas RabbitMQ é suficiente e mais simples para o escopo da solução.

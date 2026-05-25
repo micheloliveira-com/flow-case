@@ -6,7 +6,7 @@ Aceita.
 
 ## Contexto
 
-O desafio valoriza boas práticas, SOLID, design patterns, decomposição de domínio e segregação de responsabilidades. A solução precisa demonstrar clareza arquitetural sem depender apenas de frameworks.
+O case técnico valoriza boas práticas, SOLID, design patterns, decomposição de domínio e segregação de responsabilidades. A solução precisa demonstrar clareza arquitetural sem depender apenas de frameworks.
 
 ## Decisão
 
@@ -39,7 +39,7 @@ Os fluxos de negócio são modelados como use cases, por exemplo:
 
 - Mais projetos e arquivos do que uma API simples.
 - Exige disciplina para não vazar detalhes de infraestrutura para domínio/aplicação.
-- Pode parecer mais verboso para um desafio pequeno, mas evidencia as decisões esperadas para uma vaga de arquitetura.
+- Pode parecer mais verboso para um case pequeno, mas evidencia as decisões esperadas para uma vaga de arquitetura.
 
 ## Alternativas consideradas
 

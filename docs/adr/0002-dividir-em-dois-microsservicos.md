@@ -6,7 +6,7 @@ Aceita.
 
 ## Contexto
 
-O desafio define dois requisitos de negócio claros:
+O case técnico define dois requisitos de negócio claros:
 
 - Serviço de controle de lançamentos.
 - Serviço de consolidado diário.
@@ -26,7 +26,7 @@ Cada serviço possui suas próprias camadas de domínio, aplicação, infraestru
 
 - O serviço de lançamentos não depende diretamente da disponibilidade do serviço de relatórios.
 - Cada contexto pode evoluir com regras, persistência e escala independentes.
-- O modelo deixa explícita a decomposição de domínios pedida no desafio.
+- O modelo deixa explícita a decomposição de domínios esperada para o case.
 - Permite escalar o consolidado diário sem escalar necessariamente o CRUD de lançamentos.
 
 ## Trade-offs
@@ -39,4 +39,4 @@ Cada serviço possui suas próprias camadas de domínio, aplicação, infraestru
 
 - Monolito modular: seria mais simples, mas atenderia pior ao requisito de isolamento de disponibilidade.
 - Um único serviço com duas tabelas: reduziria infraestrutura, mas manteria acoplamento operacional.
-- Serverless: poderia escalar bem, mas adicionaria dependência de plataforma e não favoreceria a execução local do desafio.
+- Serverless: poderia escalar bem, mas adicionaria dependência de plataforma e não favoreceria a execução local da solução.

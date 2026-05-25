@@ -1,6 +1,6 @@
 # Flow - Controle de Fluxo de Caixa Distribuído
 
-Projeto desenvolvido para um desafio de arquitetura de software. A solução atende ao cenário de um comerciante que precisa registrar lançamentos de débito e crédito e consultar o saldo diário consolidado.
+Projeto desenvolvido como um case técnico de arquitetura de software. A solução atende ao cenário de um comerciante que precisa registrar lançamentos de débito e crédito e consultar o saldo diário consolidado.
 
 A aplicação foi implementada em C# com .NET Aspire, usando uma arquitetura distribuída com dois microsserviços principais, comunicação orientada a eventos, separação por camadas e projetos compartilhados para contratos e abstrações comuns.
 
@@ -184,7 +184,7 @@ usuário: admin
 senha: admin
 ```
 
-Essas credenciais existem apenas para ambiente local/desafio e não devem ser usadas em produção.
+Essas credenciais existem apenas para ambiente local do case técnico e não devem ser usadas em produção.
 
 ## Endpoints principais
 

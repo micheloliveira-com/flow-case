@@ -6,7 +6,7 @@ Aceita.
 
 ## Contexto
 
-O desafio menciona segurança como requisito não funcional. A solução precisa proteger APIs e demonstrar um mecanismo realista de autenticação/autorização, mesmo em ambiente local.
+O case técnico menciona segurança como requisito não funcional. A solução precisa proteger APIs e demonstrar um mecanismo realista de autenticação/autorização, mesmo em ambiente local.
 
 ## Decisão
 

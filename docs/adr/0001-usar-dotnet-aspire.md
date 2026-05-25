@@ -6,7 +6,7 @@ Aceita.
 
 ## Contexto
 
-O desafio exige uma solução distribuída, documentada e executável localmente. A aplicação possui frontend, duas APIs, RabbitMQ, Redis, Keycloak e dois bancos PostgreSQL. Manter a configuração manual desses recursos aumentaria o custo de execução e dificultaria a avaliação do projeto.
+O case técnico exige uma solução distribuída, documentada e executável localmente. A aplicação possui frontend, duas APIs, RabbitMQ, Redis, Keycloak e dois bancos PostgreSQL. Manter a configuração manual desses recursos aumentaria o custo de execução e dificultaria a avaliação do projeto.
 
 ## Decisão
 
@@ -42,4 +42,4 @@ O AppHost provisiona:
 
 - Docker Compose manual: simples e conhecido, mas exigiria mais configuração de rede, variáveis e dependências.
 - Executar cada serviço isoladamente: reduziria complexidade inicial, mas não demonstraria bem o comportamento distribuído.
-- Kubernetes local: mais próximo de produção, porém exagerado para o escopo do desafio.
+- Kubernetes local: mais próximo de produção, porém exagerado para o escopo da solução.
