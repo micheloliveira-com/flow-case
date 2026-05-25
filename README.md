@@ -204,6 +204,14 @@ Essas credenciais existem apenas para ambiente local do case técnico e não dev
 
 ## Endpoints principais
 
+As APIs estão protegidas por autenticação OIDC/JWT via Keycloak. Para chamadas diretas aos endpoints, é necessário seguir o fluxo de autenticação, obter um token válido e enviá-lo no header HTTP:
+
+```http
+Authorization: Bearer <access_token>
+```
+
+Para simplificar a validação funcional do case, o projeto inclui o frontend `Flow.Web.Blazor`, com autenticação integrada ao Keycloak e uma interface mínima para criação, edição, remoção e consulta de lançamentos, além da consulta do saldo diário consolidado. Pelo frontend, o login é feito pelo fluxo OIDC e o token é encaminhado automaticamente para as APIs.
+
 ### Transactions API
 
 | Método | Rota | Descrição |
