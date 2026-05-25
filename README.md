@@ -26,7 +26,7 @@ Além da visão resumida abaixo, os diagramas C4 completos estão disponíveis e
 
 | Diagrama | Descrição |
 | --- | --- |
-| [C4 - Arquitetura](docs/arch/c4-architecture-diagram.md) | Visão unificada do sistema contendo Contexto e Containers, com diagramas e Structurizr DSL embutido. |
+| [C4 - Arquitetura](docs/architecture/c4-architecture-diagram.md) | Visão unificada do sistema contendo Contexto e Containers, com diagramas e Structurizr DSL embutido. |
 
 ```mermaid
 flowchart LR
