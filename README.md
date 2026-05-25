@@ -26,9 +26,7 @@ Além da visão resumida abaixo, os diagramas C4 completos estão disponíveis e
 
 | Diagrama | Descrição |
 | --- | --- |
-| [C4 - Contexto](docs/architecture/c4-context.md) | Visão de alto nível do sistema, usuário e dependências externas. |
-| [C4 - Containers](docs/architecture/c4-container.md) | Visão dos principais processos executáveis, bancos e mensageria. |
-| [C4 - Componentes](docs/architecture/c4-components.md) | Visão interna dos componentes principais dos microsserviços. |
+| [C4 - Arquitetura](docs/arch/c4-architecture-diagram.md) | Visão unificada do sistema contendo Contexto e Containers, com diagramas e Structurizr DSL embutido. |
 
 ```mermaid
 flowchart LR
