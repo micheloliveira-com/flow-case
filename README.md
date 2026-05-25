@@ -1,4 +1,4 @@
-# Flow - Controle de Fluxo de Caixa Distribuído
+# Flow
 
 Projeto desenvolvido como um case técnico de arquitetura de software, com foco em boas práticas de engenharia, Clean Code, Clean Architecture, SOLID, Domain-Driven Design tático, separação de responsabilidades, testabilidade e baixo acoplamento. A solução atende ao cenário de um comerciante que precisa registrar lançamentos de débito e crédito e consultar o saldo diário consolidado.
 
