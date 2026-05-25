@@ -22,6 +22,14 @@ Este projeto é de autoria de [micheloliveira-com](https://github.com/micheloliv
 
 ## Visão da arquitetura
 
+Além da visão resumida abaixo, os diagramas C4 completos estão disponíveis em [docs/architecture](docs/architecture):
+
+| Diagrama | Descrição |
+| --- | --- |
+| [C4 - Contexto](docs/architecture/c4-context.md) | Visão de alto nível do sistema, usuário e dependências externas. |
+| [C4 - Containers](docs/architecture/c4-container.md) | Visão dos principais processos executáveis, bancos e mensageria. |
+| [C4 - Componentes](docs/architecture/c4-components.md) | Visão interna dos componentes principais dos microsserviços. |
+
 ```mermaid
 flowchart LR
     User[Usuário] --> Web[Flow.Web.Blazor]
