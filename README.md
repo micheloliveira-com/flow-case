@@ -91,7 +91,7 @@ flowchart TD
 | Componente | Responsabilidade |
 | --- | --- |
 | `Flow.Aspire.AppHost` | Orquestra a aplicação distribuída localmente com Aspire. Sobe Web, APIs, RabbitMQ, Keycloak, PostgreSQL, pgAdmin e Seq. |
-| `Flow.Web.Blazor` | Interface web para lançamentos e consulta de saldo diário. |
+| `Flow.Web.Blazor` | Interface web para lançamentos e consulta de saldo diário. Existe para validar os fluxos funcionais do case, mas não foi o principal foco arquitetural da solução. |
 | `Flow.Transactions.ApiService` | API de controle de lançamentos. Expõe CRUD de transações e publica eventos de recomputação diária. |
 | `Flow.Reports.ApiService` | API de relatórios. Consulta o saldo diário consolidado materializado. |
 | `Seq` | Centraliza logs estruturados das APIs durante a execução pelo AppHost Aspire. |
@@ -115,7 +115,7 @@ Este repositório contém as decisões arquiteturais do projeto.
 | [ADR-0004](docs/adr/0004-clean-architecture-ddd-e-use-cases.md) | Organizar os contextos com Clean Architecture, DDD tático e use cases | Aceita |
 | [ADR-0005](docs/adr/0005-persistencia-separada-por-servico.md) | Manter persistência separada por serviço | Aceita |
 | [ADR-0006](docs/adr/0006-keycloak-oidc-jwt.md) | Usar Keycloak, OIDC e JWT para autenticação | Aceita |
-| [ADR-0007](docs/adr/0007-observabilidade-local-com-seq.md) | Usar Seq para logs estruturados no ambiente | Aceita |
+| [ADR-0007](docs/adr/0007-observabilidade-com-seq.md) | Usar Seq para logs estruturados no ambiente | Aceita |
 
 ## Fluxo funcional
 
@@ -141,6 +141,7 @@ Esse desenho evita que a indisponibilidade temporária do consolidado diário bl
 
 - O serviço de lançamentos continua operando mesmo que o serviço de relatórios esteja indisponível.
 - Consumidores usam confirmação manual (`ack`) e reprocessamento com `nack` em caso de falha.
+- Os projetos executáveis usam `Flow.Aspire.ServiceDefaults`, que habilita a resiliência padrão do Aspire para `HttpClient`, incluindo handlers padrão de retry, timeout e reconnect/service discovery nas integrações suportadas.
 - Health checks, dashboard Aspire e logs estruturados no Seq facilitam diagnóstico.
 - Cada serviço possui seu próprio banco, reduzindo acoplamento operacional.
 
@@ -256,6 +257,8 @@ Authorization: Bearer <access_token>
 
 Para simplificar a validação funcional do case, o projeto inclui o frontend `Flow.Web.Blazor`, com autenticação integrada ao Keycloak e uma interface mínima para criação, edição, remoção e consulta de lançamentos, além da consulta do saldo diário consolidado. Pelo frontend, o login é feito pelo fluxo OIDC e o token é encaminhado automaticamente para as APIs.
 
+O frontend Blazor foi incluído como interface operacional para demonstrar e validar os fluxos ponta a ponta. O foco principal de arquitetura, separação de responsabilidades e testes automatizados esteve nos contextos `Transactions`, `Reports`, mensageria, persistência, autenticação e observabilidade. Por isso, a UI pode conter limitações ou bugs de experiência que não invalidam o desenho arquitetural central do case.
+
 ### Transactions API
 
 | Método | Rota | Descrição |
@@ -310,7 +313,9 @@ Os testes de `Transactions` e `Reports` cobrem regras de domínio, casos de uso,
 
 ## Observabilidade e operação
 
-O projeto usa os `ServiceDefaults` do Aspire para configurar endpoints padrão, health checks, logs e integração com o dashboard. Além disso, o AppHost provisiona um recurso `seq` para centralizar logs estruturados das APIs.
+O projeto usa os `ServiceDefaults` do Aspire para configurar endpoints padrão, health checks, logs, OpenTelemetry, service discovery e resiliência padrão de `HttpClient`. Essa configuração inclui `AddStandardResilienceHandler()` e `AddServiceDiscovery()`, habilitando comportamentos padrão de retry, timeout e reconnect/service discovery nas chamadas HTTP e integrações suportadas pelo Aspire.
+
+Além disso, o AppHost provisiona um recurso `seq` para centralizar logs estruturados das APIs.
 
 Durante a execução local, o dashboard do Aspire centraliza:
 

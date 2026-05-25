@@ -108,6 +108,8 @@ O PostgreSQL é utilizado como persistência principal, separada por contexto.
 ### Flow.Web.Blazor
 Interface do usuário responsável por autenticação e interação com APIs.
 
+O frontend existe para viabilizar a validação funcional ponta a ponta. O foco arquitetural principal do case está nos serviços de domínio, mensageria, persistência, autenticação e observabilidade; portanto, a UI pode conter limitações ou bugs de experiência.
+
 ### Transactions API
 Responsável pelo ciclo de vida dos lançamentos financeiros (write model).
 

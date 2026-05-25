@@ -24,12 +24,15 @@ O AppHost provisiona:
 - pgAdmin
 - Seq para logs estruturados
 
+Os projetos executáveis referenciam `Flow.Aspire.ServiceDefaults`, que configura OpenTelemetry, health checks, service discovery e a resiliência padrão do Aspire para `HttpClient` por meio de `AddStandardResilienceHandler()` e `AddServiceDiscovery()`. Assim, retry, timeout e reconnect/service discovery ficam habilitados de forma padronizada nas chamadas HTTP e nas integrações suportadas.
+
 Redis não foi incluído nesta versão porque o requisito informado para o consolidado diário é de 50 requisições por segundo. Para esse volume, a projeção materializada no banco de relatórios, combinada com processamento assíncrono via RabbitMQ, atende ao objetivo sem adicionar complexidade operacional desnecessária.
 
 ## Consequências positivas
 
 - Execução local simplificada com um único comando.
 - Service discovery nativo entre os projetos .NET.
+- Resiliência padrão do Aspire aplicada de forma uniforme aos serviços.
 - Centralização de logs, health checks e endpoints no dashboard Aspire.
 - Redução de configuração manual de connection strings.
 - Melhor demonstração de arquitetura distribuída em ambiente local.
