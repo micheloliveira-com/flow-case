@@ -1,8 +1,12 @@
 # Flow - Controle de Fluxo de Caixa Distribuído
 
-Projeto desenvolvido como um case técnico de arquitetura de software. A solução atende ao cenário de um comerciante que precisa registrar lançamentos de débito e crédito e consultar o saldo diário consolidado.
+Projeto desenvolvido como um case técnico de arquitetura de software, com foco em boas práticas de engenharia, Clean Code, Clean Architecture, SOLID, Domain-Driven Design tático, separação de responsabilidades, testabilidade e baixo acoplamento. A solução atende ao cenário de um comerciante que precisa registrar lançamentos de débito e crédito e consultar o saldo diário consolidado.
 
-A aplicação foi implementada em C# com .NET Aspire, usando uma arquitetura distribuída com dois microsserviços principais, comunicação orientada a eventos, separação por camadas e projetos compartilhados para contratos e abstrações comuns.
+A aplicação foi implementada em C# com .NET Aspire, usando uma arquitetura distribuída com dois microsserviços principais, comunicação orientada a eventos, use cases explícitos, persistência isolada por contexto e projetos compartilhados apenas para contratos e abstrações comuns.
+
+## Autoria e rastreabilidade
+
+Este projeto é de autoria de [micheloliveira-com](https://github.com/micheloliveira-com). Todo o histórico de desenvolvimento pode ser auditado no repositório público, a partir do commit da POC inicial: [8f67daaa7825bcc399ef2b3f7f336c8f61282417](https://github.com/micheloliveira-com/distributed-flow-transactions/commit/8f67daaa7825bcc399ef2b3f7f336c8f61282417).
 
 ## Objetivos atendidos
 
@@ -165,6 +169,19 @@ Ao iniciar, o Aspire exibirá no terminal a URL do dashboard. Pelo dashboard é 
 - Keycloak, RabbitMQ, PostgreSQL, pgAdmin e Redis.
 
 O AppHost também executa as migrations dos bancos automaticamente na inicialização das APIs.
+
+## Artefatos e deploy
+
+Para geração de artefatos e deploy em Kubernetes, o projeto pode seguir o fluxo oficial de deployment do .NET Aspire: [aspire.dev/deployment/kubernetes](https://aspire.dev/deployment/kubernetes/).
+
+Comandos principais:
+
+```bash
+aspire publish
+aspire deploy
+```
+
+O comando `aspire publish` gera os artefatos necessários para implantação, enquanto `aspire deploy` aplica o deployment no ambiente configurado.
 
 ## Login local
 
