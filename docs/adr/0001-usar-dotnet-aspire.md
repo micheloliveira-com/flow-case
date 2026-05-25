@@ -6,7 +6,7 @@ Aceita.
 
 ## Contexto
 
-O case técnico exige uma solução distribuída, documentada e executável localmente. A aplicação possui frontend, duas APIs, RabbitMQ, Redis, Keycloak e dois bancos PostgreSQL. Manter a configuração manual desses recursos aumentaria o custo de execução e dificultaria a avaliação do projeto.
+O case técnico exige uma solução distribuída, documentada e executável localmente. A aplicação possui frontend, duas APIs, RabbitMQ, Keycloak e dois bancos PostgreSQL. Manter a configuração manual desses recursos aumentaria o custo de execução e dificultaria a avaliação do projeto.
 
 ## Decisão
 
@@ -18,11 +18,12 @@ O AppHost provisiona:
 - `transactionsapiservice`
 - `reportsapiservice`
 - RabbitMQ
-- Redis
 - Keycloak com importação de realm
 - PostgreSQL para Transactions
 - PostgreSQL para Reports
 - pgAdmin
+
+Redis não foi incluído nesta versão porque o requisito informado para o consolidado diário é de 50 requisições por segundo. Para esse volume, a projeção materializada no banco de relatórios, combinada com processamento assíncrono via RabbitMQ, atende ao objetivo sem adicionar complexidade operacional desnecessária.
 
 ## Consequências positivas
 

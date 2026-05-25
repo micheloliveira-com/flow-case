@@ -38,7 +38,6 @@ flowchart LR
     RabbitMQ --> ReportsWorker[Daily Balance Worker]
     ReportsWorker --> ReportsDb
 
-    Web --> Redis[(Redis Output Cache)]
     Web --> Keycloak[Keycloak]
     TransactionsApi --> Keycloak
     ReportsApi --> Keycloak
@@ -48,7 +47,7 @@ flowchart LR
 
 | Componente | Responsabilidade |
 | --- | --- |
-| `Flow.Aspire.AppHost` | Orquestra a aplicação distribuída localmente com Aspire. Sobe Web, APIs, RabbitMQ, Redis, Keycloak e PostgreSQL. |
+| `Flow.Aspire.AppHost` | Orquestra a aplicação distribuída localmente com Aspire. Sobe Web, APIs, RabbitMQ, Keycloak e PostgreSQL. |
 | `Flow.Web.Blazor` | Interface web para lançamentos e consulta de saldo diário. |
 | `Flow.Transactions.ApiService` | API de controle de lançamentos. Expõe CRUD de transações e publica eventos de recomputação diária. |
 | `Flow.Reports.ApiService` | API de relatórios. Consulta o saldo diário consolidado materializado. |
@@ -91,7 +90,7 @@ Esse desenho evita que a indisponibilidade temporária do consolidado diário bl
 - APIs e workers podem ser escalados horizontalmente.
 - RabbitMQ absorve picos e desacopla escrita transacional de consolidação.
 - Leitura de relatórios usa modelo materializado, evitando recomputar saldos a cada consulta.
-- Redis está integrado ao frontend para cache de saída.
+- Redis não foi utilizado nesta versão porque o requisito de carga informado para o consolidado diário é de 50 requisições por segundo, volume que pode ser atendido pela projeção materializada em PostgreSQL e pelo desacoplamento assíncrono via RabbitMQ sem adicionar um componente operacional extra.
 
 ### Resiliência
 
@@ -145,7 +144,7 @@ src/
 - .NET SDK compatível com `net10.0`.
 - Docker Desktop ou runtime Docker equivalente.
 - Git.
-- Portas locais livres para os recursos do Aspire, incluindo Keycloak, RabbitMQ, PostgreSQL, Redis e aplicações web.
+- Portas locais livres para os recursos do Aspire, incluindo Keycloak, RabbitMQ, PostgreSQL e aplicações web.
 
 ## Como executar localmente
 
@@ -166,7 +165,7 @@ Ao iniciar, o Aspire exibirá no terminal a URL do dashboard. Pelo dashboard é 
 - `webfrontend`: aplicação Blazor.
 - `transactionsapiservice`: API de lançamentos.
 - `reportsapiservice`: API de relatórios.
-- Keycloak, RabbitMQ, PostgreSQL, pgAdmin e Redis.
+- Keycloak, RabbitMQ, PostgreSQL e pgAdmin.
 
 O AppHost também executa as migrations dos bancos automaticamente na inicialização das APIs.
 
