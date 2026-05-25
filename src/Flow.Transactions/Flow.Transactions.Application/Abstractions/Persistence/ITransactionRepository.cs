@@ -10,7 +10,7 @@ public interface ITransactionRepository
         DateOnly? start,
         DateOnly? end);
 
-    Task<List<Transaction>> GetByDateAsync(DateOnly date);
+    Task<decimal> GetDailyBalanceAsync(DateOnly date);
 
     Task AddAsync(Transaction transaction);
 
