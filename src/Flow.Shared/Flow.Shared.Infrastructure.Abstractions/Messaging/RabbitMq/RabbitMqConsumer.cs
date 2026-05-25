@@ -4,12 +4,15 @@ using System.Text.Json;
 using System.Threading;
 using System.Threading.Tasks;
 using Flow.Shared.Infrastructure.Abstractions.Messaging;
+using Microsoft.Extensions.Logging;
 using RabbitMQ.Client;
 using RabbitMQ.Client.Events;
 
 namespace Flow.Transactions.Infrastructure.Messaging.RabbitMq;
 
-public sealed class RabbitMqConsumer(IConnection connection) : IMessageConsumer
+public sealed class RabbitMqConsumer(
+    IConnection connection,
+    ILogger<RabbitMqConsumer> logger) : IMessageConsumer
 {
     public async Task SubscribeAsync<T>(
         string queue,
@@ -17,6 +20,9 @@ public sealed class RabbitMqConsumer(IConnection connection) : IMessageConsumer
         CancellationToken cancellationToken)
     {
         var channel = await connection.CreateChannelAsync();
+        logger.LogInformation(
+            "Starting RabbitMQ consumer for queue {Queue}",
+            queue);
 
         await channel.QueueDeclareAsync(
             queue: queue,
@@ -29,13 +35,17 @@ public sealed class RabbitMqConsumer(IConnection connection) : IMessageConsumer
 
         consumer.ReceivedAsync += async (_, args) =>
         {
-            var json = Encoding.UTF8.GetString(args.Body.Span);
-            var message = JsonSerializer.Deserialize<T>(json);
-
             try
             {
+                var json = Encoding.UTF8.GetString(args.Body.Span);
+                var message = JsonSerializer.Deserialize<T>(json);
+
                 if (message is null)
                 {
+                    logger.LogWarning(
+                        "Received invalid RabbitMQ message on queue {Queue}. Delivery tag: {DeliveryTag}",
+                        queue,
+                        args.DeliveryTag);
                     await channel.BasicNackAsync(
                         deliveryTag: args.DeliveryTag,
                         multiple: false,
@@ -50,9 +60,18 @@ public sealed class RabbitMqConsumer(IConnection connection) : IMessageConsumer
                     deliveryTag: args.DeliveryTag,
                     multiple: false,
                     cancellationToken: cancellationToken);
+                logger.LogInformation(
+                    "Processed RabbitMQ message from queue {Queue}. Delivery tag: {DeliveryTag}",
+                    queue,
+                    args.DeliveryTag);
             }
-            catch
+            catch (Exception ex)
             {
+                logger.LogError(
+                    ex,
+                    "Failed to process RabbitMQ message from queue {Queue}. Delivery tag: {DeliveryTag}",
+                    queue,
+                    args.DeliveryTag);
                 await channel.BasicNackAsync(
                     deliveryTag: args.DeliveryTag,
                     multiple: false,

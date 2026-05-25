@@ -3,6 +3,7 @@ using Flow.Transactions.Application.Abstractions.Persistence;
 using Flow.Transactions.Application.UseCases.Transactions.UpdateTransaction;
 using Flow.Transactions.Domain.Entities;
 using Flow.Transactions.Domain.Entities.Enums;
+using Microsoft.Extensions.Logging.Abstractions;
 using Moq;
 
 namespace Flow.Transactions.Tests.Application;
@@ -22,7 +23,10 @@ public sealed class UpdateTransactionServiceTests
             .ReturnsAsync((Transaction?)null)
             .Verifiable();
 
-        var service = new UpdateTransactionService(repository.Object, publisher.Object);
+        var service = new UpdateTransactionService(
+            repository.Object,
+            publisher.Object,
+            NullLogger<UpdateTransactionService>.Instance);
 
         // Act
         var actual = await service.ExecuteAsync(id, CreateRequest(new DateOnly(2026, 5, 24)));
@@ -71,7 +75,10 @@ public sealed class UpdateTransactionServiceTests
             .Returns(Task.CompletedTask)
             .Verifiable();
 
-        var service = new UpdateTransactionService(repository.Object, publisher.Object);
+        var service = new UpdateTransactionService(
+            repository.Object,
+            publisher.Object,
+            NullLogger<UpdateTransactionService>.Instance);
 
         // Act
         var actual = await service.ExecuteAsync(id, request);
@@ -129,7 +136,10 @@ public sealed class UpdateTransactionServiceTests
             .Returns(Task.CompletedTask)
             .Verifiable();
 
-        var service = new UpdateTransactionService(repository.Object, publisher.Object);
+        var service = new UpdateTransactionService(
+            repository.Object,
+            publisher.Object,
+            NullLogger<UpdateTransactionService>.Instance);
 
         // Act
         await service.ExecuteAsync(id, request);

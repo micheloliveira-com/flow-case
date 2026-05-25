@@ -1,5 +1,6 @@
 using System.Text.Json;
 using Flow.Transactions.Infrastructure.Messaging.RabbitMq;
+using Microsoft.Extensions.Logging.Abstractions;
 using Moq;
 using RabbitMQ.Client;
 
@@ -38,7 +39,9 @@ public sealed class RabbitMqPublisherTests
             .Setup(x => x.Dispose())
             .Verifiable();
 
-        var publisher = new RabbitMqPublisher(connection.Object);
+        var publisher = new RabbitMqPublisher(
+            connection.Object,
+            NullLogger<RabbitMqPublisher>.Instance);
 
         // Act
         await publisher.PublishAsync("transaction-created", message);

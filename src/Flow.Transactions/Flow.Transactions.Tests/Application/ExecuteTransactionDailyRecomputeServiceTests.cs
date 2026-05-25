@@ -5,6 +5,7 @@ using Flow.Transactions.Application.Abstractions.Persistence;
 using Flow.Transactions.Application.UseCases.DailyRecompute.ExecuteTransactionDailyRecompute;
 using Flow.Transactions.Domain.Entities;
 using Flow.Transactions.Domain.Entities.Enums;
+using Microsoft.Extensions.Logging.Abstractions;
 using Moq;
 
 namespace Flow.Transactions.Tests.Application;
@@ -40,7 +41,10 @@ public sealed class ExecuteTransactionDailyRecomputeServiceTests
             .Returns(Task.CompletedTask)
             .Verifiable();
 
-        var service = new ExecuteTransactionDailyRecomputeService(repository.Object, publisher.Object);
+        var service = new ExecuteTransactionDailyRecomputeService(
+            repository.Object,
+            publisher.Object,
+            NullLogger<ExecuteTransactionDailyRecomputeService>.Instance);
 
         // Act
         await service.ExecuteAsync(new TransactionDailyRecomputeMessage(date));
@@ -72,7 +76,10 @@ public sealed class ExecuteTransactionDailyRecomputeServiceTests
             .Returns(Task.CompletedTask)
             .Verifiable();
 
-        var service = new ExecuteTransactionDailyRecomputeService(repository.Object, publisher.Object);
+        var service = new ExecuteTransactionDailyRecomputeService(
+            repository.Object,
+            publisher.Object,
+            NullLogger<ExecuteTransactionDailyRecomputeService>.Instance);
 
         // Act
         await service.ExecuteAsync(new TransactionDailyRecomputeMessage(date));

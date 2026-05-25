@@ -2,12 +2,14 @@ using Flow.Transactions.Application.Abstractions.Messaging;
 using Flow.Transactions.Application.Abstractions.Messaging.TransactionDailyRecompute;
 using Flow.Transactions.Application.Abstractions.Persistence;
 using Flow.Transactions.Domain.Entities;
+using Microsoft.Extensions.Logging;
 
 namespace Flow.Transactions.Application.UseCases.Transactions.UpdateTransaction;
 
 public sealed class UpdateTransactionService(
     ITransactionRepository repository,
-    ITransactionDailyRecomputePublisher publisher)
+    ITransactionDailyRecomputePublisher publisher,
+    ILogger<UpdateTransactionService> logger)
     : IUpdateTransactionService
 {
     public async Task<Transaction?> ExecuteAsync(
@@ -17,7 +19,10 @@ public sealed class UpdateTransactionService(
         var tx = await repository.GetByIdAsync(id);
 
         if (tx is null)
+        {
+            logger.LogWarning("Transaction {TransactionId} was not found for update", id);
             return null;
+        }
 
         var oldDate = tx.Date;
 
@@ -30,6 +35,11 @@ public sealed class UpdateTransactionService(
         );
 
         await repository.UpdateAsync(updated);
+        logger.LogInformation(
+            "Updated transaction {TransactionId}. Old date: {OldDate}. New date: {NewDate}",
+            id,
+            oldDate,
+            request.Date);
 
         var affectedDates = new HashSet<DateOnly>
         {
@@ -38,13 +48,16 @@ public sealed class UpdateTransactionService(
         };
 
         await repository.SaveChangesAsync();
-        
+
         foreach (var date in affectedDates)
         {
             await publisher.PublishAsync(new TransactionDailyRecomputeMessage(date));
+            logger.LogInformation(
+                "Published daily recompute request for updated transaction {TransactionId} on {Date}",
+                id,
+                date);
         }
 
-        
         return updated;
     }
 }

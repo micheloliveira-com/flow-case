@@ -3,6 +3,7 @@ using Flow.Transactions.Application.Abstractions.Persistence;
 using Flow.Transactions.Application.UseCases.Transactions.CreateTransaction;
 using Flow.Transactions.Domain.Entities;
 using Flow.Transactions.Domain.Entities.Enums;
+using Microsoft.Extensions.Logging.Abstractions;
 using Moq;
 
 namespace Flow.Transactions.Tests.Application;
@@ -37,7 +38,10 @@ public sealed class CreateTransactionServiceTests
             .Returns(Task.CompletedTask)
             .Verifiable();
 
-        var service = new CreateTransactionService(repository.Object, publisher.Object);
+        var service = new CreateTransactionService(
+            repository.Object,
+            publisher.Object,
+            NullLogger<CreateTransactionService>.Instance);
 
         // Act
         var actual = await service.ExecuteAsync(request);

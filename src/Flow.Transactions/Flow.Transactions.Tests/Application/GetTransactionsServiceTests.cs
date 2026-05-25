@@ -2,6 +2,7 @@ using Flow.Transactions.Application.Abstractions.Persistence;
 using Flow.Transactions.Application.UseCases.Transactions.GetTransactions;
 using Flow.Transactions.Domain.Entities;
 using Flow.Transactions.Domain.Entities.Enums;
+using Microsoft.Extensions.Logging.Abstractions;
 using Moq;
 
 namespace Flow.Transactions.Tests.Application;
@@ -25,7 +26,9 @@ public sealed class GetTransactionsServiceTests
             .ReturnsAsync(expected)
             .Verifiable();
 
-        var service = new GetTransactionsService(repository.Object);
+        var service = new GetTransactionsService(
+            repository.Object,
+            NullLogger<GetTransactionsService>.Instance);
 
         // Act
         var actual = await service.ExecuteAsync(new GetTransactionsRequest(start, end));

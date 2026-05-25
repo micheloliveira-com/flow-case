@@ -3,6 +3,7 @@ using Flow.Transactions.Application.Abstractions.Persistence;
 using Flow.Transactions.Application.UseCases.Transactions.DeleteTransaction;
 using Flow.Transactions.Domain.Entities;
 using Flow.Transactions.Domain.Entities.Enums;
+using Microsoft.Extensions.Logging.Abstractions;
 using Moq;
 
 namespace Flow.Transactions.Tests.Application;
@@ -22,7 +23,10 @@ public sealed class DeleteTransactionServiceTests
             .ReturnsAsync((Transaction?)null)
             .Verifiable();
 
-        var service = new DeleteTransactionService(repository.Object, publisher.Object);
+        var service = new DeleteTransactionService(
+            repository.Object,
+            publisher.Object,
+            NullLogger<DeleteTransactionService>.Instance);
 
         // Act
         var actual = await service.ExecuteAsync(new DeleteTransactionRequest(id));
@@ -64,7 +68,10 @@ public sealed class DeleteTransactionServiceTests
             .Returns(Task.CompletedTask)
             .Verifiable();
 
-        var service = new DeleteTransactionService(repository.Object, publisher.Object);
+        var service = new DeleteTransactionService(
+            repository.Object,
+            publisher.Object,
+            NullLogger<DeleteTransactionService>.Instance);
 
         // Act
         var actual = await service.ExecuteAsync(new DeleteTransactionRequest(id));

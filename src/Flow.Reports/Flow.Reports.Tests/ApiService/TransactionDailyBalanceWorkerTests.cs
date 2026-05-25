@@ -4,6 +4,7 @@ using Flow.Reports.Infrastructure.Messaging.Consumers;
 using Flow.Shared.Application.Abstractions.Messaging;
 using Flow.Shared.Infrastructure.Abstractions.Messaging;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Logging.Abstractions;
 using Moq;
 
 namespace Flow.Reports.Tests.ApiService;
@@ -26,7 +27,9 @@ public sealed class TransactionDailyBalanceWorkerTests
             .BuildServiceProvider();
 
         var scopeFactory = serviceProvider.GetRequiredService<IServiceScopeFactory>();
-        var worker = new TransactionDailyBalanceWorker(scopeFactory);
+        var worker = new TransactionDailyBalanceWorker(
+            scopeFactory,
+            NullLogger<TransactionDailyBalanceWorker>.Instance);
         var message = new TransactionDailyBalanceMessage(
             new DateOnly(2026, 5, 24),
             150m,

@@ -3,10 +3,13 @@
 using System.Net.Http.Json;
 using Microsoft.AspNetCore.WebUtilities;
 using System.Globalization;
+using Microsoft.Extensions.Logging;
 
 namespace Flow.Web.Blazor;
 
-public class TransactionBalanceApiClient(HttpClient httpClient)
+public class TransactionBalanceApiClient(
+    HttpClient httpClient,
+    ILogger<TransactionBalanceApiClient> logger)
 {
     public async Task<TransactionDailyBalance[]> GetTransactionDailyBalancesAsync(
         DateOnly? start,
@@ -25,9 +28,13 @@ public class TransactionBalanceApiClient(HttpClient httpClient)
         if (query.Count > 0)
             url = QueryHelpers.AddQueryString(url, query);
 
-        return await httpClient.GetFromJsonAsync<TransactionDailyBalance[]>(
-                   url)
-               ?? [];
+        var balances = await httpClient.GetFromJsonAsync<TransactionDailyBalance[]>(
+            url) ?? [];
+        logger.LogInformation(
+            "Retrieved {BalanceCount} transaction daily balances from reports API",
+            balances.Length);
+
+        return balances;
     }
 }
 

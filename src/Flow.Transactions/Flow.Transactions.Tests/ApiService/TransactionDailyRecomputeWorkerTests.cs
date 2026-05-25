@@ -4,6 +4,7 @@ using Flow.Transactions.Application.UseCases.DailyRecompute.ExecuteTransactionDa
 using Flow.Transactions.Infrastructure.Messaging.Consumers;
 using Flow.Shared.Infrastructure.Abstractions.Messaging;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Logging.Abstractions;
 using Moq;
 
 namespace Flow.Transactions.Tests.ApiService;
@@ -26,7 +27,9 @@ public sealed class TransactionDailyRecomputeWorkerTests
             .BuildServiceProvider();
 
         var scopeFactory = serviceProvider.GetRequiredService<IServiceScopeFactory>();
-        var worker = new TransactionDailyRecomputeWorker(scopeFactory);
+        var worker = new TransactionDailyRecomputeWorker(
+            scopeFactory,
+            NullLogger<TransactionDailyRecomputeWorker>.Instance);
         var message = new TransactionDailyRecomputeMessage(new DateOnly(2026, 5, 24));
 
         consumer

@@ -34,10 +34,20 @@ public sealed class ExecuteTransactionDailyBalanceService(
                 message.ProcessedAt);
 
             await repository.AddAsync(current);
+            logger.LogInformation(
+                "Created transaction daily balance for {Date} with balance {Balance} processed at {ProcessedAt}",
+                message.Date,
+                message.Balance,
+                message.ProcessedAt);
         }
         else
         {
             current.Apply(message.Balance, message.ProcessedAt);
+            logger.LogInformation(
+                "Updated transaction daily balance for {Date} with balance {Balance} processed at {ProcessedAt}",
+                message.Date,
+                message.Balance,
+                message.ProcessedAt);
         }
 
         await repository.SaveChangesAsync();

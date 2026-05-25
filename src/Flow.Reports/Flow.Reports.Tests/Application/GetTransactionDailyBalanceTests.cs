@@ -1,6 +1,7 @@
 using Flow.Reports.Application.Abstractions.Persistence;
 using Flow.Reports.Application.UseCases.TransactionDailyBalance.GetTransactionDailyBalance;
 using Flow.Reports.Domain.Entities;
+using Microsoft.Extensions.Logging.Abstractions;
 using Moq;
 
 namespace Flow.Reports.Tests.Application;
@@ -29,7 +30,9 @@ public sealed class GetTransactionDailyBalanceTests
             .ReturnsAsync(expected)
             .Verifiable();
 
-        var service = new GetTransactionDailyBalance(repository.Object);
+        var service = new GetTransactionDailyBalance(
+            repository.Object,
+            NullLogger<GetTransactionDailyBalance>.Instance);
 
         // Act
         var actual = await service.ExecuteAsync(request);

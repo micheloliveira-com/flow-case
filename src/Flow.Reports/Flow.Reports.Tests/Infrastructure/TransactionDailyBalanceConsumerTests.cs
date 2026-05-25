@@ -1,6 +1,7 @@
 using Flow.Reports.Infrastructure.Messaging.Consumers;
 using Flow.Shared.Application.Abstractions.Messaging;
 using Flow.Shared.Infrastructure.Abstractions.Messaging;
+using Microsoft.Extensions.Logging.Abstractions;
 using Moq;
 
 namespace Flow.Reports.Tests.Infrastructure;
@@ -23,7 +24,9 @@ public sealed class TransactionDailyBalanceConsumerTests
             .Returns(Task.CompletedTask)
             .Verifiable();
 
-        var sut = new TransactionDailyBalanceConsumer(consumer.Object);
+        var sut = new TransactionDailyBalanceConsumer(
+            consumer.Object,
+            NullLogger<TransactionDailyBalanceConsumer>.Instance);
 
         // Act
         await sut.StartAsync(handler, cancellationTokenSource.Token);
