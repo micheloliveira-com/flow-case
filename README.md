@@ -29,6 +29,10 @@ O projeto segue boas práticas de arquitetura e design, mas evita a introdução
 
 Inversão de controle (IoC) e a independência da camada de aplicação em relação à infraestrutura foram corretamente atingidos neste case, com aplicação efetiva de Dependency Injection e isolamento por meio de contratos (ports), garantindo desacoplamento dos detalhes de persistência e mensageria.
 
+A camada de Application concentra os contratos (ports) e casos de uso, enquanto a Infrastructure atua exclusivamente como camada de implementação desses contratos, mantendo a inversão de dependência conforme o padrão de ports and adapters.
+
+Todas as classes, interfaces e contratos foram organizados conforme suas responsabilidades e camadas apropriadas. O projeto Domain contém exclusivamente elementos de negócio, como entidades e regras de domínio, sem dependências de Application, Infrastructure ou ApiService, e sem a presença de DTOs ou modelos anêmicos. Essa organização segue os princípios de Clean Architecture e Domain-Driven Design.
+
 ## Visão da arquitetura
 
 Além da visão resumida abaixo, os diagramas C4 completos estão disponíveis em [docs/architecture](docs/architecture):
