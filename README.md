@@ -22,7 +22,7 @@ Este projeto é de autoria de [micheloliveira-com](https://github.com/micheloliv
 
 ## Imagens do sistema
 
-Veja em: `docs/image/images.md`
+Veja em: [Imagens do sistema](docs/image/images.md)
 
 ## Visão da arquitetura
 
