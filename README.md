@@ -186,26 +186,52 @@ src/
 
 ## Pré-requisitos
 
-- .NET SDK compatível com `net10.0`.
-- Docker Desktop ou runtime Docker equivalente.
+- .NET SDK compatível com `net10.0`: https://dotnet.microsoft.com/pt-br/download/dotnet/10.0
+- Docker Desktop: https://www.docker.com/products/docker-desktop/
+- Aspire CLI 13 instalado globalmente: https://aspire.dev/pt-br/get-started/install-cli/
 - Git.
-- Portas locais livres para os recursos do Aspire, incluindo Keycloak, RabbitMQ, PostgreSQL, Seq e aplicações web.
+- Certificados locais do Aspire confiáveis.
+- Portas locais e memória livre para os recursos do Aspire, incluindo Keycloak, RabbitMQ, PostgreSQL, Seq e aplicações web.
+
+## Instalação do Aspire CLI
+
+```bash
+curl -sSL https://aspire.dev/install.sh | bash
+```
+
+```powershell
+irm https://aspire.dev/install.ps1 | iex
+```
+
+Verificar instalação:
+
+```bash
+aspire --version
+```
+
+## Inicialização do ambiente local
+
+Confiar nos certificados locais (obrigatório para iniciar os serviços):
+
+```bash
+aspire certs trust
+```
 
 ## Como executar localmente
 
-Restaure os pacotes:
+Executar o AppHost via Aspire na pasta raiz do projeto já clonado:
 
 ```bash
-dotnet restore src/Flow.slnx
+aspire run
 ```
 
-Execute o AppHost do Aspire:
+Ao iniciar, o Aspire exibirá no terminal a URL do dashboard com a chave de autenticação. 
 
-```bash
-dotnet run --project src/Flow.Aspire/Flow.Aspire.AppHost/Flow.Aspire.AppHost.csproj
-```
+Exemplo: https://aspireapp.dev.localhost:17206/login?t=312j31hik3h1i
 
-Ao iniciar, o Aspire exibirá no terminal a URL do dashboard. Pelo dashboard é possível acessar:
+Cole no navegador a URL com a autenticação correta e aguarde a inicialização de todos os serviços (healthy), (1~5 minutos caso não tenha nenhuma imagem baixada).
+
+Pelo dashboard é possível acessar:
 
 - `webfrontend`: aplicação Blazor.
 - `transactionsapiservice`: API de lançamentos.
