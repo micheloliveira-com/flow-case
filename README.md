@@ -152,7 +152,6 @@ src/
   Flow.Aspire/
     Flow.Aspire.AppHost/
     Flow.Aspire.ServiceDefaults/
-    Flow.Aspire.Tests/
   Flow.Transactions/
     Flow.Transactions.ApiService/
     Flow.Transactions.Application/
@@ -291,10 +290,9 @@ Executar testes por contexto, incluindo o AppHost Aspire:
 ```bash
 dotnet test src/Flow.Transactions/Flow.Transactions.Tests/Flow.Transactions.Tests.csproj
 dotnet test src/Flow.Reports/Flow.Reports.Tests/Flow.Reports.Tests.csproj
-dotnet test src/Flow.Aspire/Flow.Aspire.Tests/Flow.Aspire.Tests.csproj
 ```
 
-Os testes de `Transactions` e `Reports` cobrem regras de domínio, casos de uso, repositórios, publicadores e consumidores. O projeto `Flow.Aspire.Tests` valida a inicialização do recurso web pelo AppHost Aspire.
+Os testes de `Transactions` e `Reports` cobrem regras de domínio, casos de uso, repositórios, publicadores e consumidores.
 
 ## Observabilidade e operação
 
