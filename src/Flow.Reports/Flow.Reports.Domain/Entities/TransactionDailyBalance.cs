@@ -1,3 +1,5 @@
+using System.Linq.Expressions;
+
 namespace Flow.Reports.Domain.Entities;
 
 public class TransactionDailyBalance
@@ -10,6 +12,9 @@ public class TransactionDailyBalance
 
     public DateTime ProcessedAt { get; private set; }
 
+    public static Expression<Func<TransactionDailyBalance, bool>> HasBalanceExpression =>
+        x => x.Balance != 0;
+        
     private TransactionDailyBalance() { } // EF Core
 
     public TransactionDailyBalance(DateOnly date, decimal balance, DateTime processedAt)

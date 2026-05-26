@@ -18,7 +18,7 @@ public sealed class TransactionDailyBalanceRepository(
         DateOnly? end)
     {
         var query = db.TransactionDailyBalance.AsNoTracking();
-        query = query.Where(x => x.Balance != 0);
+        query = query.Where(TransactionDailyBalance.HasBalanceExpression);
 
         if (start.HasValue)
             query = query.Where(x => x.Date >= start.Value);
