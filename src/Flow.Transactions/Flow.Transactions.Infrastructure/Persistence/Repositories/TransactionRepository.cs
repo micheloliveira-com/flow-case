@@ -32,10 +32,7 @@ public sealed class TransactionRepository(
         return await db.Transactions
             .AsNoTracking()
             .Where(x => x.Date == date)
-            .SumAsync(x =>
-                x.Type == TransactionType.Credit
-                    ? x.Amount
-                    : -x.Amount);
+            .SumAsync(Transaction.SignedAmountExpression);
     }
 
     public async Task AddAsync(Transaction transaction)

@@ -1,4 +1,5 @@
 using Flow.Transactions.Domain.Entities.Enums;
+using System.Linq.Expressions;
 
 namespace Flow.Transactions.Domain.Entities;
 
@@ -13,6 +14,11 @@ public class Transaction
     public DateOnly Date { get; private set; }
 
     public string? Description { get; private set; }
+
+    public static Expression<Func<Transaction, decimal>> SignedAmountExpression => t =>
+        t.Type == TransactionType.Credit
+            ? t.Amount
+            : -t.Amount;
 
     private Transaction() { } // Entity Framework requires a parameterless constructor
 
