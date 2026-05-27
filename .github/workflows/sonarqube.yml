@@ -42,6 +42,7 @@ jobs:
       - name: Install SonarScanner
         run: |
           dotnet tool install --global dotnet-sonarscanner
+          dotnet tool install --global coverlet.console
           echo "$HOME/.dotnet/tools" >> $GITHUB_PATH
 
       - name: Build and analyze
@@ -55,10 +56,11 @@ jobs:
             /o:"micheloliveira-com" \
             /d:sonar.token="${SONAR_TOKEN}" \
             /d:sonar.host.url="https://sonarcloud.io" \
-            /d:sonar.cs.opencover.reportsPaths="**/*.coverage.xml"
+            /d:sonar.cs.opencover.reportsPaths="**/coverage.xml"
           
           dotnet build
-
+          
+          # Find first folder ending with .Tests (case-insensitive)
           # Find all folders ending with .Tests (case-insensitive)
           test_project_dirs=$(find . -type d -iname '*.tests')
 
@@ -67,31 +69,28 @@ jobs:
             exit 1
           fi
 
-          coverage_args=""
-
           while IFS= read -r test_project_dir; do
             echo "Found test project folder: $test_project_dir"
 
             project_name=$(basename "$test_project_dir")
 
-            csproj_path=$(find "$test_project_dir" -maxdepth 1 -type f -name '*.csproj' | head -n 1)
+            dll_path=$(find "$test_project_dir/bin" -type f -name "${project_name}.dll" | head -n 1)
 
-            if [ -z "$csproj_path" ]; then
-              echo "No .csproj file found inside $test_project_dir!"
+            if [ -z "$dll_path" ]; then
+              echo "No DLL named $project_name.dll found inside $test_project_dir/bin!"
               exit 1
             fi
 
-            coverage_file="$(basename "$test_project_dir").coverage.xml"
+            echo "Found test DLL: $dll_path"
 
-            dotnet test "$csproj_path" \
-              --no-build \
-              /p:CollectCoverage=true \
-              /p:CoverletOutputFormat=opencover \
-              /p:CoverletOutput="./$coverage_file"
+            coverage_file="$test_project_dir/coverage.xml"
 
-            coverage_args="$coverage_args,${test_project_dir}/${coverage_file}"
+            coverlet "$dll_path" \
+                --target "dotnet" \
+                --targetargs "test --no-build" \
+                -f=opencover \
+                -o="$coverage_file"
+
           done <<< "$test_project_dirs"
-
-          coverage_args=${coverage_args#,}
-
+              
           dotnet-sonarscanner end /d:sonar.token="${SONAR_TOKEN}"
