@@ -4,7 +4,12 @@
     <TargetFramework>net10.0</TargetFramework>
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
-    <NoWarn>$(NoWarn);CA1873</NoWarn>
+    <!--
+    Suppress:
+    - CA1873 because extensive logging was planned in this project.
+    - S1144 because private setters are required for EF Core entity materialization.
+    -->
+    <NoWarn>$(NoWarn);CA1873;S1144</NoWarn>
   </PropertyGroup>
 
 </Project>
