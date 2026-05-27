@@ -6,6 +6,8 @@
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
     <UserSecretsId>1ce94c66-e313-439f-b5e8-11644382ae14</UserSecretsId>
+    <!-- Exclude the Aspire AppHost project from analysis, as it is not a target for benchmarking -->
+    <SonarQubeExclude>true</SonarQubeExclude>
   </PropertyGroup>
 
   <ItemGroup>
