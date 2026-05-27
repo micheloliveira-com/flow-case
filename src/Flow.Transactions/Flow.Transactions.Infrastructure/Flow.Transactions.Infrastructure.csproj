@@ -7,6 +7,12 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <SonarQubeSetting Include="sonar.coverage.exclusions">
+      <Value>**/Migrations/**</Value>
+    </SonarQubeSetting>
+  </ItemGroup>
+  
+  <ItemGroup>
     <ProjectReference Include="..\Flow.Transactions.Domain\Flow.Transactions.Domain.csproj" />
     <ProjectReference Include="..\..\Flow.Shared\Flow.Shared.Infrastructure.Abstractions\Flow.Shared.Infrastructure.Abstractions.csproj" />
     <ProjectReference Include="..\Flow.Transactions.Application\Flow.Transactions.Application.csproj" />
