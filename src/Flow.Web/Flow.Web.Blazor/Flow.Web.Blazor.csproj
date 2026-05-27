@@ -5,7 +5,7 @@
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
     <BlazorDisableThrowNavigationException>true</BlazorDisableThrowNavigationException>
-    <!-- Exclude the Blazor project from analysis, as it is not a target for benchmarking -->
+    <!-- Exclude the Blazor project from analysis, as it is not a target for benchmarking unit tests -->
     <SonarQubeExclude>true</SonarQubeExclude>
   </PropertyGroup>
 
