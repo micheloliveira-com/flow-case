@@ -8,6 +8,26 @@ A aplicação foi implementada em C# com .NET Aspire, usando uma arquitetura dis
 
 Este projeto é de autoria de [micheloliveira-com](https://github.com/micheloliveira-com). Todo o histórico de desenvolvimento pode ser auditado no repositório público, a partir do commit da POC inicial: [8f67daaa7825bcc399ef2b3f7f336c8f61282417](https://github.com/micheloliveira-com/flow-case/commit/8f67daaa7825bcc399ef2b3f7f336c8f61282417).
 
+## Métricas de qualidade
+
+[![SonarQube Status](https://img.shields.io/github/actions/workflow/status/micheloliveira-com/flow-case/sonarqube.yml?branch=main)](https://github.com/micheloliveira-com/flow-case/actions/workflows/sonarqube.yml)
+
+[![Quality gate](https://sonarcloud.io/api/project_badges/quality_gate?project=micheloliveira-com_flow-case)](https://sonarcloud.io/summary/new_code?id=micheloliveira-com_flow-case)
+
+[![SonarQube Cloud](https://sonarcloud.io/images/project_badges/sonarcloud-dark.svg)](https://sonarcloud.io/summary/new_code?id=micheloliveira-com_flow-case)
+
+[![Vulnerabilities](https://sonarcloud.io/api/project_badges/measure?project=micheloliveira-com_flow-case&metric=vulnerabilities)](https://sonarcloud.io/dashboard?id=micheloliveira-com_flow-case)
+[![Bugs](https://sonarcloud.io/api/project_badges/measure?project=micheloliveira-com_flow-case&metric=bugs)](https://sonarcloud.io/dashboard?id=micheloliveira-com_flow-case)
+[![Security Rating](https://sonarcloud.io/api/project_badges/measure?project=micheloliveira-com_flow-case&metric=security_rating)](https://sonarcloud.io/dashboard?id=micheloliveira-com_flow-case)
+[![Maintainability Rating (SQALE)](https://sonarcloud.io/api/project_badges/measure?project=micheloliveira-com_flow-case&metric=sqale_rating)](https://sonarcloud.io/dashboard?id=micheloliveira-com_flow-case)
+[![Code Smells](https://sonarcloud.io/api/project_badges/measure?project=micheloliveira-com_flow-case&metric=code_smells)](https://sonarcloud.io/dashboard?id=micheloliveira-com_flow-case)
+[![Lines of Code](https://sonarcloud.io/api/project_badges/measure?project=micheloliveira-com_flow-case&metric=ncloc)](https://sonarcloud.io/dashboard?id=micheloliveira-com_flow-case)
+[![Coverage](https://sonarcloud.io/api/project_badges/measure?project=micheloliveira-com_flow-case&metric=coverage)](https://sonarcloud.io/dashboard?id=micheloliveira-com_flow-case)
+[![Technical Debt (SQALE Index)](https://sonarcloud.io/api/project_badges/measure?project=micheloliveira-com_flow-case&metric=sqale_index)](https://sonarcloud.io/dashboard?id=micheloliveira-com_flow-case)
+[![Alert Status](https://sonarcloud.io/api/project_badges/measure?project=micheloliveira-com_flow-case&metric=alert_status)](https://sonarcloud.io/dashboard?id=micheloliveira-com_flow-case)
+[![Reliability Rating](https://sonarcloud.io/api/project_badges/measure?project=micheloliveira-com_flow-case&metric=reliability_rating)](https://sonarcloud.io/dashboard?id=micheloliveira-com_flow-case)
+[![Duplicated Lines Density](https://sonarcloud.io/api/project_badges/measure?project=micheloliveira-com_flow-case&metric=duplicated_lines_density)](https://sonarcloud.io/dashboard?id=micheloliveira-com_flow-case)
+
 ## Objetivos atendidos
 
 - Controle de lançamentos financeiros por data, tipo, valor e descrição.
