@@ -13,7 +13,7 @@ Este projeto é de autoria de [micheloliveira-com](https://github.com/micheloliv
 > [SonarCloud](https://sonarcloud.io/dashboard?id=micheloliveira-com_flow-case)
 
 > Nota: A análise e a cobertura de testes deste projeto contemplam exclusivamente as camadas `Application`, `Domain` e `Infrastructure`, validadas por meio de testes unitários.
-> Testes de integração e/ou end-to-end não foram realizados e, portanto, não foram considerados nas métricas de qualidade.
+> Testes de integração e/ou end-to-end não foram realizados e, portanto, suas respectivas camadas foram excluídas da análise e não foram consideradas nas métricas de qualidade.
 
 [![SonarQube Status](https://img.shields.io/github/actions/workflow/status/micheloliveira-com/flow-case/sonarqube.yml?branch=main)](https://github.com/micheloliveira-com/flow-case/actions/workflows/sonarqube.yml)
 
