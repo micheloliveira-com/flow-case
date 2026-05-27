@@ -19,7 +19,7 @@ public sealed class RabbitMqConsumer(
         MessageHandler<T> handler,
         CancellationToken cancellationToken)
     {
-        var channel = await connection.CreateChannelAsync();
+        var channel = await connection.CreateChannelAsync(cancellationToken: cancellationToken);
         logger.LogInformation(
             "Starting RabbitMQ consumer for queue {Queue}",
             queue);
