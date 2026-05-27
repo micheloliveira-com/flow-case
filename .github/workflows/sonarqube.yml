@@ -56,6 +56,7 @@ jobs:
             /o:"micheloliveira-com" \
             /d:sonar.token="${SONAR_TOKEN}" \
             /d:sonar.host.url="https://sonarcloud.io" \
+            /d:sonar.exclusions="**/*.Blazor/**" \
             /d:sonar.cs.opencover.reportsPaths="**/coverage.xml"
           
           dotnet build
