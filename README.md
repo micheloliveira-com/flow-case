@@ -366,14 +366,7 @@ Execute os testes dos contextos de negócio presentes na solution:
 dotnet test src/Flow.slnx
 ```
 
-Executar testes por contexto, incluindo o AppHost Aspire:
-
-```bash
-dotnet test src/Flow.Transactions/Flow.Transactions.Tests/Flow.Transactions.Tests.csproj
-dotnet test src/Flow.Reports/Flow.Reports.Tests/Flow.Reports.Tests.csproj
-```
-
-Os testes de `Transactions` e `Reports` cobrem regras de domínio, casos de uso, repositórios, publicadores e consumidores.
+Os testes `Shared`, `Transactions` e `Reports` cobrem regras de domínio, casos de uso, repositórios, publicadores e consumidores.
 
 ![Imagem dos testes](assets/tests.jpg)
 
