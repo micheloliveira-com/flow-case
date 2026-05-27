@@ -282,19 +282,6 @@ Pelo dashboard é possível acessar:
 
 O AppHost também executa as migrations dos bancos automaticamente na inicialização das APIs.
 
-## Artefatos e deploy
-
-O projeto ainda não está configurado para deploy em Kubernetes. Para uma evolução de produção, o AppHost do .NET Aspire poderia ser preparado para geração de artefatos e deployment seguindo o fluxo oficial: [aspire.dev/deployment/kubernetes](https://aspire.dev/deployment/kubernetes/).
-
-Nesse cenário, os comandos principais seriam:
-
-```bash
-aspire publish
-aspire deploy
-```
-
-O comando `aspire publish` gera os artefatos necessários para implantação, enquanto `aspire deploy` aplica o deployment no ambiente configurado. Essa configuração também poderia compor uma estratégia de Infrastructure as Code, com manifests versionados e empacotamento via Helm para parametrização por ambiente.
-
 ## Login local
 
 O realm do Keycloak é importado a partir de `src/Flow.Aspire/Flow.Aspire.AppHost/Realms`.
@@ -390,6 +377,19 @@ O Seq aparece como um recurso no dashboard do Aspire. Pelo endpoint exposto ali 
 - `reportsapiservice`
 
 As APIs se conectam ao recurso por meio de `builder.AddSeqEndpoint(connectionName: "seq")`. No AppHost, o Seq é configurado com lifetime persistente para preservar dados locais entre execuções e com `ExcludeFromManifest`, pois a integração atual foi pensada para a experiência do case técnico. Em produção, a estratégia de observabilidade deveria ser definida explicitamente no ambiente de deploy, incluindo retenção, segurança, volume esperado, dashboards e alertas.
+
+## Artefatos e deploy
+
+O projeto ainda não está configurado para deploy em Kubernetes. Para uma evolução de produção, o AppHost do .NET Aspire poderia ser preparado para geração de artefatos e deployment seguindo o fluxo oficial: [aspire.dev/deployment/kubernetes](https://aspire.dev/deployment/kubernetes/).
+
+Nesse cenário, os comandos principais seriam:
+
+```bash
+aspire publish
+aspire deploy
+```
+
+O comando `aspire publish` gera os artefatos necessários para implantação, enquanto `aspire deploy` aplica o deployment no ambiente configurado. Essa configuração também poderia compor uma estratégia de Infrastructure as Code, com manifests versionados e empacotamento via Helm para parametrização por ambiente.
 
 ## Evoluções recomendadas para produção
 
