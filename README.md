@@ -30,7 +30,7 @@ Este projeto é de autoria de [micheloliveira-com](https://github.com/micheloliv
 [![Reliability Rating](https://sonarcloud.io/api/project_badges/measure?project=micheloliveira-com_flow-case&metric=reliability_rating)](https://sonarcloud.io/dashboard?id=micheloliveira-com_flow-case)
 [![Duplicated Lines Density](https://sonarcloud.io/api/project_badges/measure?project=micheloliveira-com_flow-case&metric=duplicated_lines_density)](https://sonarcloud.io/dashboard?id=micheloliveira-com_flow-case)
 
-> Nota: A análise e a cobertura de testes deste projeto contemplam exclusivamente as camadas `Application`, `Domain` e `Infrastructure` de cada microsserviço, validadas por meio de testes unitários.
+> Nota: A análise e a cobertura de testes deste projeto contemplam exclusivamente as camadas `Application`, `Domain`, `Infrastructure` e `Shared` de cada microsserviço, validadas por meio de testes unitários.
 > Testes de integração e/ou end-to-end não foram realizados e, portanto, suas respectivas camadas foram excluídas da análise e não foram consideradas nas métricas de qualidade.
 
 ## Objetivos atendidos
