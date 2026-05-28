@@ -162,6 +162,8 @@ Este repositório contém as decisões arquiteturais do projeto.
 
 ## Fluxo funcional
 
+O sistema adota Event-Driven Architecture (EDA), onde a comunicação entre contextos ocorre de forma assíncrona através de mensagens publicadas no RabbitMQ.
+
 1. O usuário cria, altera ou remove um lançamento no serviço `Transactions`.
 2. A transação é persistida no banco do contexto de lançamentos.
 3. O serviço publica uma mensagem `transaction-daily-recompute` com as datas afetadas.
