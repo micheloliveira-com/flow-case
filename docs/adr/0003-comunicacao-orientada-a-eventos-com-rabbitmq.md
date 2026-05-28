@@ -45,7 +45,6 @@ Para produção, a decisão deve ser complementada com:
 - Dead-letter queue.
 - Retry com backoff.
 - Monitoramento de lag da fila.
-- Testes de carga para validar o requisito de 50 requisições por segundo e perda máxima de 5%.
 
 ## Alternativas consideradas
 
