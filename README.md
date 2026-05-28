@@ -10,6 +10,8 @@ Este projeto é de autoria de [micheloliveira-com](https://github.com/micheloliv
 
 ## Métricas de qualidade
 
+O projeto possui pipeline de Continuous Integration (CI) via GitHub Actions, responsável por executar build, testes automatizados e análise estática com SonarCloud a cada alteração submetida ao repositório.
+
 [SonarCloud](https://sonarcloud.io/dashboard?id=micheloliveira-com_flow-case)
 
 [![SonarQube Status](https://img.shields.io/github/actions/workflow/status/micheloliveira-com/flow-case/sonarqube.yml?branch=main)](https://github.com/micheloliveira-com/flow-case/actions/workflows/sonarqube.yml)
@@ -162,10 +164,10 @@ Este repositório contém as decisões arquiteturais do projeto.
 
 1. O usuário cria, altera ou remove um lançamento no serviço `Transactions`.
 2. A transação é persistida no banco do contexto de lançamentos.
-3. O serviço publica uma mensagem `transaction-daily-recompute` com a data afetada.
+3. O serviço publica uma mensagem `transaction-daily-recompute` com as datas afetadas.
 4. Um worker do próprio contexto de lançamentos consome essa mensagem, recalcula o saldo do dia a partir da fonte transacional e publica `transaction-daily-balance`.
-5. O serviço `Reports` consome o saldo consolidado e atualiza sua própria projeção de leitura.
-6. A consulta de saldo diário lê diretamente do banco de relatórios.
+5. O serviço `Reports` consome a mensagem `transaction-daily-balance`, contendo o saldo diário consolidado recalculado, e atualiza sua própria projeção materializada de leitura.
+6. A consulta de saldo diário consolidado do serviço `Reports` lê diretamente do banco de relatórios.
 
 Esse desenho evita que a indisponibilidade temporária do consolidado diário bloqueie o registro de novos lançamentos.
 
@@ -402,7 +404,7 @@ O comando `aspire publish` gera os artefatos necessários para implantação, en
 - Externalizar secrets com cofre de segredos.
 - Separar configurações de desenvolvimento, homologação e produção.
 - Aplicar políticas mais granulares de autorização por role/scope.
-- Criar pipeline CI/CD com build, testes, análise estática e publicação de imagens.
+- Evoluir a pipeline atual para suportar Continuous Delivery (CD) com deploy automatizado entre ambientes.
 
 ## Resumo
 
