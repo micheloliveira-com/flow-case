@@ -1,14 +1,16 @@
 # Flow Case - Michel Oliveira
 
-Projeto desenvolvido como um case técnico de arquitetura de software, com foco em boas práticas de engenharia, Clean Code, Clean Architecture, SOLID, Domain-Driven Design tático, separação de responsabilidades, testabilidade e baixo acoplamento. A solução atende ao cenário de um comerciante que precisa registrar lançamentos de débito e crédito e consultar o saldo diário consolidado.
+Projeto desenvolvido como um case técnico de arquitetura de software, com foco em boas práticas de engenharia, incluindo Clean Code, Clean Architecture, SOLID e Domain-Driven Design tático, com ênfase em separação de responsabilidades, testabilidade e baixo acoplamento. A solução atende ao cenário de um comerciante que precisa registrar lançamentos de débito e crédito e consulta o saldo diário consolidado.
 
-A aplicação foi implementada em C# com .NET Aspire, usando uma arquitetura distribuída com dois microsserviços principais, comunicação orientada a eventos, use cases explícitos, persistência isolada por contexto e projetos compartilhados apenas para contratos e abstrações comuns.
+A aplicação foi implementada em C# com .NET Aspire, adotando uma arquitetura distribuída baseada em dois microsserviços principais, comunicação orientada a eventos, casos de uso explicitamente modelados, persistência isolada por contexto e compartilhamento restrito a contratos e abstrações comuns entre serviços.
 
 ## Autoria e rastreabilidade
 
 Este projeto é de autoria de [micheloliveira-com](https://github.com/micheloliveira-com). Todo o histórico de desenvolvimento pode ser auditado no repositório público, a partir do commit da POC inicial: [8f67daaa7825bcc399ef2b3f7f336c8f61282417](https://github.com/micheloliveira-com/flow-case/commit/8f67daaa7825bcc399ef2b3f7f336c8f61282417).
 
 ## Métricas de qualidade
+
+O projeto possui pipeline de Continuous Integration (CI) via GitHub Actions, responsável por executar build, testes automatizados e análise estática com SonarCloud a cada alteração submetida ao repositório.
 
 [SonarCloud](https://sonarcloud.io/dashboard?id=micheloliveira-com_flow-case)
 
@@ -160,14 +162,16 @@ Este repositório contém as decisões arquiteturais do projeto.
 
 ## Fluxo funcional
 
+O sistema adota Event-Driven Architecture (EDA), onde a comunicação entre contextos ocorre de forma assíncrona através de mensagens publicadas no RabbitMQ, garantindo o desacoplamento entre os serviços e processos, que deixam de depender diretamente uns dos outros e passam a interagir apenas por eventos.
+
 1. O usuário cria, altera ou remove um lançamento no serviço `Transactions`.
 2. A transação é persistida no banco do contexto de lançamentos.
-3. O serviço publica uma mensagem `transaction-daily-recompute` com a data afetada.
-4. Um worker do próprio contexto de lançamentos consome essa mensagem, recalcula o saldo do dia a partir da fonte transacional e publica `transaction-daily-balance`.
-5. O serviço `Reports` consome o saldo consolidado e atualiza sua própria projeção de leitura.
-6. A consulta de saldo diário lê diretamente do banco de relatórios.
+3. O serviço publica uma mensagem na fila `transaction-daily-recompute` com as datas afetadas.
+4. Um worker do próprio contexto de lançamentos consome essa mensagem, recalcula o saldo do dia a partir da fonte transacional e publica na fila `transaction-daily-balance`.
+5. O serviço `Reports` consome a mensagem da fila `transaction-daily-balance`, contendo o saldo diário consolidado recalculado, e atualiza sua própria projeção materializada de leitura.
+6. A consulta de saldo diário consolidado do serviço `Reports` lê diretamente do banco de relatórios.
 
-Esse desenho evita que a indisponibilidade temporária do consolidado diário bloqueie o registro de novos lançamentos.
+Essa arquitetura evita que a indisponibilidade temporária do consolidado diário bloqueie o registro de novos lançamentos, e vice versa, mantendo os contextos desacoplados operacionalmente.
 
 ## Requisitos não funcionais
 
@@ -402,7 +406,7 @@ O comando `aspire publish` gera os artefatos necessários para implantação, en
 - Externalizar secrets com cofre de segredos.
 - Separar configurações de desenvolvimento, homologação e produção.
 - Aplicar políticas mais granulares de autorização por role/scope.
-- Criar pipeline CI/CD com build, testes, análise estática e publicação de imagens.
+- Evoluir a pipeline atual para suportar Continuous Delivery (CD) com deploy automatizado entre ambientes.
 
 ## Resumo
 
