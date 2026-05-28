@@ -201,7 +201,7 @@ Essa arquitetura evita que a indisponibilidade temporária do consolidado diári
 
 - O modelo é eventualmente consistente: lançamentos são confirmados primeiro; o saldo diário é atualizado de forma assíncrona.
 - O consumidor de relatórios ignora mensagens antigas quando já existe uma consolidação mais recente para a data.
-- Para produção, os próximos passos naturais seriam implementar Outbox Pattern, mensagens persistentes, DLQ, retry com backoff, métricas de atraso de fila e testes de carga para validar o alvo de 50 requisições por segundo com perda máxima de 5%.
+- Para produção, os próximos passos naturais seriam implementar Outbox Pattern, mensagens persistentes, DLQ, retry com backoff, métricas de atraso de fila.
 
 ## Estrutura do repositório
 
@@ -400,7 +400,6 @@ O comando `aspire publish` gera os artefatos necessários para implantação, en
 - Implementar Outbox Pattern no serviço de lançamentos para garantir atomicidade entre persistência e publicação de eventos.
 - Configurar mensagens persistentes, DLQ, retry com backoff e políticas de TTL no RabbitMQ.
 - Definir `prefetch`, concorrência de consumidores e particionamento por data para suportar picos controlados.
-- Adicionar testes de carga para validar 50 requisições por segundo no consolidado diário e medir perda, latência e atraso de fila.
 - Adicionar métricas de negócio e operação: quantidade de lançamentos por minuto, lag da fila, falhas de consumo, tempo de consolidação e disponibilidade por serviço.
 - Definir política de observabilidade produtiva para logs estruturados, métricas, traces, retenção e alertas.
 - Externalizar secrets com cofre de segredos.
