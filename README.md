@@ -166,9 +166,9 @@ O sistema adota Event-Driven Architecture (EDA), onde a comunicação entre cont
 
 1. O usuário cria, altera ou remove um lançamento no serviço `Transactions`.
 2. A transação é persistida no banco do contexto de lançamentos.
-3. O serviço publica uma mensagem `transaction-daily-recompute` com as datas afetadas.
-4. Um worker do próprio contexto de lançamentos consome essa mensagem, recalcula o saldo do dia a partir da fonte transacional e publica `transaction-daily-balance`.
-5. O serviço `Reports` consome a mensagem `transaction-daily-balance`, contendo o saldo diário consolidado recalculado, e atualiza sua própria projeção materializada de leitura.
+3. O serviço publica uma mensagem na fila `transaction-daily-recompute` com as datas afetadas.
+4. Um worker do próprio contexto de lançamentos consome essa mensagem, recalcula o saldo do dia a partir da fonte transacional e publica na fila `transaction-daily-balance`.
+5. O serviço `Reports` consome a mensagem da fila `transaction-daily-balance`, contendo o saldo diário consolidado recalculado, e atualiza sua própria projeção materializada de leitura.
 6. A consulta de saldo diário consolidado do serviço `Reports` lê diretamente do banco de relatórios.
 
 Esse desenho evita que a indisponibilidade temporária do consolidado diário bloqueie o registro de novos lançamentos.
