@@ -406,6 +406,7 @@ O comando `aspire publish` gera os artefatos necessários para implantação, en
 - Externalizar secrets com cofre de segredos.
 - Separar configurações de desenvolvimento, homologação e produção.
 - Aplicar políticas mais granulares de autorização por role/scope.
+- Implementar WAF (Web Application Firewall) na borda para mitigação de ataques OWASP Top 10 e proteção das APIs expostas.
 - Evoluir a pipeline atual para suportar Continuous Delivery (CD) com deploy automatizado entre ambientes.
 
 ## Resumo
