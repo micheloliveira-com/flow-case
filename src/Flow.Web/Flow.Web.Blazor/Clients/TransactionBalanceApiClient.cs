@@ -1,6 +1,7 @@
-using System.Net.Http.Json;
-using Microsoft.AspNetCore.WebUtilities;
 using System.Globalization;
+using System.Net.Http.Json;
+using Flow.Web.Blazor.Clients.Models;
+using Microsoft.AspNetCore.WebUtilities;
 using Microsoft.Extensions.Logging;
 
 namespace Flow.Web.Blazor.Clients;
@@ -13,43 +14,114 @@ public class TransactionBalanceApiClient(
         DateOnly? start,
         DateOnly? end)
     {
-        var url = "/transaction_daily_balance";
+        var url = BuildTransactionDailyBalancesUrl(
+            start,
+            end);
 
-        var query = new Dictionary<string, string?>();
+        var response = await SendGetRequestAsync(url);
 
-        if (start.HasValue)
-            query["start"] = start.Value.ToString("yyyy-MM-dd", CultureInfo.InvariantCulture);
+        await EnsureSuccessStatusCodeAsync(response);
 
-        if (end.HasValue)
-            query["end"] = end.Value.ToString("yyyy-MM-dd", CultureInfo.InvariantCulture);
+        var balances = await ReadBalancesAsync(response);
 
-        if (query.Count > 0)
-            url = QueryHelpers.AddQueryString(url, query);
-
-        var response = await httpClient.GetAsync(url);
-
-        if (!response.IsSuccessStatusCode)
-        {
-            var message = await ApiErrorReader.ReadMessageAsync(response);
-            logger.LogWarning(
-                "Failed to retrieve transaction daily balances. Status code: {StatusCode}. Message: {Message}",
-                response.StatusCode,
-                message);
-            throw new ApiClientException(message);
-        }
-
-        var balances = await response.Content.ReadFromJsonAsync<TransactionDailyBalance[]>()
-            ?? [];
-        logger.LogInformation(
-            "Retrieved {BalanceCount} transaction daily balances from reports API",
-            balances.Length);
+        LogBalancesRetrieved(balances.Length);
 
         return balances;
     }
-}
 
-public record TransactionDailyBalance(
-    Guid Id,
-    decimal Balance,
-    DateOnly Date,
-    DateTime CreatedAtUtc);
+    private static string BuildTransactionDailyBalancesUrl(
+        DateOnly? start,
+        DateOnly? end)
+    {
+        var url = "/transaction_daily_balance";
+
+        var query = CreateQuery(start, end);
+
+        return query.Count > 0
+            ? QueryHelpers.AddQueryString(url, query)
+            : url;
+    }
+
+    private static Dictionary<string, string?> CreateQuery(
+        DateOnly? start,
+        DateOnly? end)
+    {
+        var query = new Dictionary<string, string?>();
+
+        AddStartDateQuery(query, start);
+
+        AddEndDateQuery(query, end);
+
+        return query;
+    }
+
+    private static void AddStartDateQuery(
+        IDictionary<string, string?> query,
+        DateOnly? start)
+    {
+        if (start.HasValue)
+        {
+            query["start"] = start.Value.ToString(
+                "yyyy-MM-dd",
+                CultureInfo.InvariantCulture);
+        }
+    }
+
+    private static void AddEndDateQuery(
+        IDictionary<string, string?> query,
+        DateOnly? end)
+    {
+        if (end.HasValue)
+        {
+            query["end"] = end.Value.ToString(
+                "yyyy-MM-dd",
+                CultureInfo.InvariantCulture);
+        }
+    }
+
+    private async Task<HttpResponseMessage> SendGetRequestAsync(string url)
+    {
+        return await httpClient.GetAsync(url);
+    }
+
+    private async Task EnsureSuccessStatusCodeAsync(
+        HttpResponseMessage response)
+    {
+        if (response.IsSuccessStatusCode)
+        {
+            return;
+        }
+
+        var message = await ApiErrorReader.ReadMessageAsync(response);
+
+        LogApiFailure(
+            response,
+            message);
+
+        throw new ApiClientException(message);
+    }
+
+    private void LogApiFailure(
+        HttpResponseMessage response,
+        string message)
+    {
+        logger.LogWarning(
+            "Failed to retrieve transaction daily balances. Status code: {StatusCode}. Message: {Message}",
+            response.StatusCode,
+            message);
+    }
+
+    private static async Task<TransactionDailyBalance[]> ReadBalancesAsync(
+        HttpResponseMessage response)
+    {
+        return await response.Content.ReadFromJsonAsync<TransactionDailyBalance[]>()
+            ?? [];
+    }
+
+    private void LogBalancesRetrieved(int balanceCount)
+    {
+        logger.LogInformation(
+            "Retrieved {BalanceCount} transaction daily balances from reports API",
+            balanceCount);
+    }
+}

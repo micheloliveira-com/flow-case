@@ -14,14 +14,37 @@ public sealed class RabbitMqPublisher(
         T message)
     {
         using var channel = await connection.CreateChannelAsync();
-        var body = JsonSerializer.SerializeToUtf8Bytes(message);
 
+        var body = SerializeMessage(message);
+
+        await PublishMessageAsync(
+            channel,
+            routingKey,
+            body);
+
+        LogPublishedMessage<T>(routingKey);
+    }
+
+    private static byte[] SerializeMessage<T>(T message)
+    {
+        return JsonSerializer.SerializeToUtf8Bytes(message);
+    }
+
+    private static async Task PublishMessageAsync(
+        IChannel channel,
+        string routingKey,
+        byte[] body)
+    {
         await channel.BasicPublishAsync(
-            exchange: "",
+            exchange: string.Empty,
             routingKey: routingKey,
             mandatory: false,
             basicProperties: new BasicProperties(),
             body: body);
+    }
+
+    private void LogPublishedMessage<T>(string routingKey)
+    {
         logger.LogInformation(
             "Published RabbitMQ message to routing key {RoutingKey} with payload type {MessageType}",
             routingKey,
