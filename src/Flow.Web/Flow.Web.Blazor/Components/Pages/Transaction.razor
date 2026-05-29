@@ -1,4 +1,5 @@
-﻿@using Flow.Web.Blazor.Clients.Models;
+﻿@using Flow.Web.Blazor.Models.Enums
+
 @page "/transaction"
 @rendermode InteractiveServer
 
@@ -67,7 +68,7 @@ else
                         {
                             @foreach (var tx in transactions)
                             {
-                                <tr class='@(tx.Type == TransactionType.Debit ? "table-danger" : "table-success")'>
+                                <tr class='@(tx.Type == TransactionTypeEnum.Debit ? "table-danger" : "table-success")'>
                                     <td>@tx.Date</td>
                                     <td>@tx.Type</td>
                                     <td>$@tx.Amount</td>
@@ -127,7 +128,7 @@ else
                         <label class="form-label">Type</label>
                         <select class="form-select"
                                 @bind="formModel.Type">
-                            @foreach (var type in Enum.GetValues<TransactionType>())
+                            @foreach (var type in Enum.GetValues<TransactionTypeEnum>())
                             {
                                 <option value="@type">@type</option>
                             }

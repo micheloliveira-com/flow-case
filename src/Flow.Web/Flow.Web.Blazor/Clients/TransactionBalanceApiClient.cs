@@ -1,6 +1,6 @@
 using System.Globalization;
 using System.Net.Http.Json;
-using Flow.Web.Blazor.Clients.Models;
+using Flow.Web.Blazor.Models;
 using Microsoft.AspNetCore.WebUtilities;
 using Microsoft.Extensions.Logging;
 
@@ -10,7 +10,7 @@ public class TransactionBalanceApiClient(
     HttpClient httpClient,
     ILogger<TransactionBalanceApiClient> logger)
 {
-    public async Task<TransactionDailyBalance[]> GetTransactionDailyBalancesAsync(
+    public async Task<TransactionDailyBalanceModel[]> GetTransactionDailyBalancesAsync(
         DateOnly? start,
         DateOnly? end)
     {
@@ -111,10 +111,10 @@ public class TransactionBalanceApiClient(
             message);
     }
 
-    private static async Task<TransactionDailyBalance[]> ReadBalancesAsync(
+    private static async Task<TransactionDailyBalanceModel[]> ReadBalancesAsync(
         HttpResponseMessage response)
     {
-        return await response.Content.ReadFromJsonAsync<TransactionDailyBalance[]>()
+        return await response.Content.ReadFromJsonAsync<TransactionDailyBalanceModel[]>()
             ?? [];
     }
 

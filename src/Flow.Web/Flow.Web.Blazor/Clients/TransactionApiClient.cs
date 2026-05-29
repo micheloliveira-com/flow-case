@@ -1,4 +1,4 @@
-using Flow.Web.Blazor.Clients.Models;
+using Flow.Web.Blazor.Models;
 using Microsoft.AspNetCore.WebUtilities;
 using Microsoft.Extensions.Logging;
 
@@ -8,7 +8,7 @@ public class TransactionApiClient(
     HttpClient httpClient,
     ILogger<TransactionApiClient> logger)
 {
-    public async Task<Transaction[]> GetTransactionsAsync(
+    public async Task<TransactionModel[]> GetTransactionsAsync(
         DateOnly? start,
         DateOnly? end)
     {
@@ -23,7 +23,7 @@ public class TransactionApiClient(
         return transactions;
     }
 
-    public async Task<Transaction> CreateAsync(Transaction input)
+    public async Task<TransactionModel> CreateAsync(TransactionModel input)
     {
         var response = await SendCreateRequestAsync(input);
 
@@ -38,7 +38,7 @@ public class TransactionApiClient(
         return transaction;
     }
 
-    public async Task<bool> UpdateAsync(Guid id, Transaction input)
+    public async Task<bool> UpdateAsync(Guid id, TransactionModel input)
     {
         var response = await SendUpdateRequestAsync(id, input);
 
@@ -110,9 +110,9 @@ public class TransactionApiClient(
         }
     }
 
-    private async Task<Transaction[]> GetTransactionsFromApiAsync(string url)
+    private async Task<TransactionModel[]> GetTransactionsFromApiAsync(string url)
     {
-        return await httpClient.GetFromJsonAsync<Transaction[]>(url) ?? [];
+        return await httpClient.GetFromJsonAsync<TransactionModel[]>(url) ?? [];
     }
 
     private void LogTransactionsRetrieved(int transactionCount)
@@ -122,7 +122,7 @@ public class TransactionApiClient(
             transactionCount);
     }
 
-    private async Task<HttpResponseMessage> SendCreateRequestAsync(Transaction input)
+    private async Task<HttpResponseMessage> SendCreateRequestAsync(TransactionModel input)
     {
         return await httpClient.PostAsJsonAsync(
             "/transactions",
@@ -131,7 +131,7 @@ public class TransactionApiClient(
 
     private async Task<HttpResponseMessage> SendUpdateRequestAsync(
         Guid id,
-        Transaction input)
+        TransactionModel input)
     {
         return await httpClient.PutAsJsonAsync(
             $"/transactions/{id}",
@@ -174,10 +174,10 @@ public class TransactionApiClient(
             message);
     }
 
-    private async Task<Transaction> ReadTransactionAsync(
+    private async Task<TransactionModel> ReadTransactionAsync(
         HttpResponseMessage response)
     {
-        return await response.Content.ReadFromJsonAsync<Transaction>()
+        return await response.Content.ReadFromJsonAsync<TransactionModel>()
             ?? throw new ApiClientException(
                 "The transactions API returned an empty response.");
     }
