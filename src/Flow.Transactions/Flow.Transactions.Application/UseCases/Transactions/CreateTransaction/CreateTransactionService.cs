@@ -5,6 +5,7 @@ using Flow.Transactions.Domain.Entities;
 using Microsoft.Extensions.Logging;
 
 namespace Flow.Transactions.Application.UseCases.Transactions.CreateTransaction;
+
 public sealed class CreateTransactionService(
     ITransactionRepository repository,
     ITransactionDailyRecomputePublisher publisher,
@@ -16,7 +17,7 @@ public sealed class CreateTransactionService(
     {
         var transaction = CreateTransaction(request);
 
-        await PersistAsync(transaction);
+        await PersistTransactionAsync(transaction);
 
         LogTransactionCreated(transaction);
 
@@ -25,17 +26,46 @@ public sealed class CreateTransactionService(
         return transaction;
     }
 
-    private async Task PersistAsync(Transaction transaction)
+    private async Task PersistTransactionAsync(Transaction transaction)
+    {
+        await AddTransactionAsync(transaction);
+
+        await SaveChangesAsync();
+    }
+
+    private async Task AddTransactionAsync(Transaction transaction)
     {
         await repository.AddAsync(transaction);
+    }
+
+    private async Task SaveChangesAsync()
+    {
         await repository.SaveChangesAsync();
     }
 
     private async Task PublishDailyRecomputeAsync(Transaction transaction)
     {
-        await publisher.PublishAsync(
-            new TransactionDailyRecomputeMessage(transaction.Date));
+        var message = CreateDailyRecomputeMessage(transaction);
 
+        await PublishMessageAsync(message);
+
+        LogDailyRecomputePublished(transaction);
+    }
+
+    private static TransactionDailyRecomputeMessage CreateDailyRecomputeMessage(
+        Transaction transaction)
+    {
+        return new TransactionDailyRecomputeMessage(transaction.Date);
+    }
+
+    private async Task PublishMessageAsync(
+        TransactionDailyRecomputeMessage message)
+    {
+        await publisher.PublishAsync(message);
+    }
+
+    private void LogDailyRecomputePublished(Transaction transaction)
+    {
         logger.LogInformation(
             "Published daily recompute request for transaction {TransactionId} on {Date}",
             transaction.Id,

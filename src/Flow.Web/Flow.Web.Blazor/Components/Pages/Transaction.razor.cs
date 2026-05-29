@@ -1,7 +1,8 @@
 using Microsoft.AspNetCore.Components;
 using Microsoft.JSInterop;
 using Flow.Web.Blazor.Clients;
-using Flow.Web.Blazor.Components.Pages.Models;
+using Flow.Web.Blazor.Models;
+using Flow.Web.Blazor.Models.Enums;
 
 namespace Flow.Web.Blazor.Components.Pages;
 
@@ -13,7 +14,7 @@ public partial class Transaction
     [Inject]
     private IJSRuntime JS { get; set; } = default!;
 
-    private Flow.Web.Blazor.Clients.Transaction[]? transactions;
+    private TransactionModel[]? transactions;
     private bool isLoading = true;
     private string? errorMessage;
 
@@ -56,7 +57,7 @@ public partial class Transaction
         formModel = CreateDefaultFormModel();
     }
 
-    private void StartEdit(Flow.Web.Blazor.Clients.Transaction tx)
+    private void StartEdit(TransactionModel tx)
     {
         isModalOpen = true;
         isEditing = true;
@@ -84,7 +85,7 @@ public partial class Transaction
 
         try
         {
-            var input = new Flow.Web.Blazor.Clients.Transaction(
+            var input = new TransactionModel(
                 formModel.Id,
                 formModel.Amount,
                 formModel.Type,
@@ -134,7 +135,7 @@ public partial class Transaction
         return new TransactionEditModel
         {
             Amount = 0,
-            Type = TransactionType.Credit,
+            Type = TransactionTypeEnum.Credit,
             Date = DateOnly.FromDateTime(DateTime.Now),
             Description = string.Empty
         };

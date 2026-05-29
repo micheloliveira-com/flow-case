@@ -15,29 +15,51 @@ public sealed class ExecuteTransactionDailyRecomputeService(
     public async Task ExecuteAsync(
         TransactionDailyRecomputeMessage message)
     {
-        var date = message.Date;
+        var date = GetMessageDate(message);
 
         LogDailyBalanceRecomputing(date);
 
-        var balance = await repository.GetDailyBalanceAsync(date);
+        var balance = await GetDailyBalanceAsync(date);
 
-        await PublishDailyBalanceAsync(date, balance);
+        await PublishDailyBalanceAsync(
+            date,
+            balance);
+    }
+
+    private static DateOnly GetMessageDate(
+        TransactionDailyRecomputeMessage message)
+    {
+        return message.Date;
+    }
+
+    private async Task<decimal> GetDailyBalanceAsync(DateOnly date)
+    {
+        return await repository.GetDailyBalanceAsync(date);
     }
 
     private async Task PublishDailyBalanceAsync(
         DateOnly date,
         decimal balance)
     {
-        await publisher.PublishAsync(
-            new TransactionDailyBalanceMessage(
-                date,
-                balance,
-                DateTime.UtcNow));
-
-        logger.LogInformation(
-            "Published daily balance for {Date} with balance {Balance}",
+        var dailyBalanceMessage = CreateDailyBalanceMessage(
             date,
             balance);
+
+        await publisher.PublishAsync(dailyBalanceMessage);
+
+        LogDailyBalancePublished(
+            date,
+            balance);
+    }
+
+    private static TransactionDailyBalanceMessage CreateDailyBalanceMessage(
+        DateOnly date,
+        decimal balance)
+    {
+        return new TransactionDailyBalanceMessage(
+            date,
+            balance,
+            DateTime.UtcNow);
     }
 
     private void LogDailyBalanceRecomputing(DateOnly date)
@@ -45,5 +67,15 @@ public sealed class ExecuteTransactionDailyRecomputeService(
         logger.LogInformation(
             "Recomputing daily balance for {Date}",
             date);
+    }
+
+    private void LogDailyBalancePublished(
+        DateOnly date,
+        decimal balance)
+    {
+        logger.LogInformation(
+            "Published daily balance for {Date} with balance {Balance}",
+            date,
+            balance);
     }
 }

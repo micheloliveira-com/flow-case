@@ -40,7 +40,18 @@ public sealed class UpdateTransactionService(
 
     private async Task PersistAsync(Transaction transaction)
     {
+        await UpdateTransactionAsync(transaction);
+
+        await SaveChangesAsync();
+    }
+
+    private async Task UpdateTransactionAsync(Transaction transaction)
+    {
         await repository.UpdateAsync(transaction);
+    }
+
+    private async Task SaveChangesAsync()
+    {
         await repository.SaveChangesAsync();
     }
 
@@ -51,14 +62,36 @@ public sealed class UpdateTransactionService(
     {
         foreach (var date in GetAffectedDates(oldDate, newDate))
         {
-            await publisher.PublishAsync(
-                new TransactionDailyRecomputeMessage(date));
+            var message = CreateDailyRecomputeMessage(date);
 
-            logger.LogInformation(
-                "Published daily recompute request for transaction {TransactionId} on {Date}",
+            await PublishMessageAsync(message);
+
+            LogDailyRecomputePublished(
                 transactionId,
                 date);
         }
+    }
+
+    private static TransactionDailyRecomputeMessage CreateDailyRecomputeMessage(
+        DateOnly date)
+    {
+        return new TransactionDailyRecomputeMessage(date);
+    }
+
+    private async Task PublishMessageAsync(
+        TransactionDailyRecomputeMessage message)
+    {
+        await publisher.PublishAsync(message);
+    }
+
+    private void LogDailyRecomputePublished(
+        Guid transactionId,
+        DateOnly date)
+    {
+        logger.LogInformation(
+            "Published daily recompute request for transaction {TransactionId} on {Date}",
+            transactionId,
+            date);
     }
 
     private static Transaction CreateUpdatedTransaction(

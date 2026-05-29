@@ -1,3 +1,4 @@
+using Flow.Web.Blazor.Models;
 using Microsoft.AspNetCore.WebUtilities;
 using Microsoft.Extensions.Logging;
 
@@ -7,101 +8,198 @@ public class TransactionApiClient(
     HttpClient httpClient,
     ILogger<TransactionApiClient> logger)
 {
-    public async Task<Transaction[]> GetTransactionsAsync(
+    public async Task<TransactionModel[]> GetTransactionsAsync(
         DateOnly? start,
         DateOnly? end)
     {
-        var url = "/transactions";
+        var url = BuildTransactionsUrl(
+            start,
+            end);
 
-        var query = new Dictionary<string, string?>();
+        var transactions = await GetTransactionsFromApiAsync(url);
 
-        if (start.HasValue)
-            query["start"] = start.Value.ToString("yyyy-MM-dd");
-
-        if (end.HasValue)
-            query["end"] = end.Value.ToString("yyyy-MM-dd");
-
-        if (query.Count > 0)
-            url = QueryHelpers.AddQueryString(url, query);
-
-        var transactions = await httpClient.GetFromJsonAsync<Transaction[]>(
-            url) ?? [];
-        logger.LogInformation(
-            "Retrieved {TransactionCount} transactions from transactions API",
-            transactions.Length);
+        LogTransactionsRetrieved(transactions.Length);
 
         return transactions;
     }
 
-    public async Task<Transaction> CreateAsync(Transaction input)
+    public async Task<TransactionModel> CreateAsync(TransactionModel input)
     {
-        var response = await httpClient.PostAsJsonAsync("/transactions", input);
+        var response = await SendCreateRequestAsync(input);
 
-        if (!response.IsSuccessStatusCode)
-        {
-            var message = await ApiErrorReader.ReadMessageAsync(response);
-            logger.LogWarning(
-                "Failed to create transaction. Status code: {StatusCode}. Message: {Message}",
-                response.StatusCode,
-                message);
-            throw new ApiClientException(message);
-        }
+        await EnsureSuccessStatusCodeAsync(
+            response,
+            $"Failed to create transaction.");
 
-        var transaction = await response.Content.ReadFromJsonAsync<Transaction>()
-            ?? throw new ApiClientException("The transactions API returned an empty response.");
-        logger.LogInformation(
-            "Created transaction {TransactionId} through transactions API",
-            transaction.Id);
+        var transaction = await ReadTransactionAsync(response);
+
+        LogTransactionCreated(transaction.Id);
 
         return transaction;
     }
 
-    public async Task<bool> UpdateAsync(Guid id, Transaction input)
+    public async Task<bool> UpdateAsync(Guid id, TransactionModel input)
     {
-        var response = await httpClient.PutAsJsonAsync($"/transactions/{id}", input);
-        if (!response.IsSuccessStatusCode)
-        {
-            var message = await ApiErrorReader.ReadMessageAsync(response);
-            logger.LogWarning(
-                "Failed to update transaction {TransactionId}. Status code: {StatusCode}. Message: {Message}",
-                id,
-                response.StatusCode,
-                message);
-            throw new ApiClientException(message);
-        }
+        var response = await SendUpdateRequestAsync(id, input);
 
-        logger.LogInformation(
-            "Updated transaction {TransactionId} through transactions API",
-            id);
+        await EnsureSuccessStatusCodeAsync(
+            response,
+            $"Failed to update transaction {id}.");
+
+        LogTransactionUpdated(id);
 
         return response.IsSuccessStatusCode;
     }
 
     public async Task<bool> DeleteAsync(Guid id)
     {
-        var response = await httpClient.DeleteAsync($"/transactions/{id}");
-        if (!response.IsSuccessStatusCode)
-        {
-            var message = await ApiErrorReader.ReadMessageAsync(response);
-            logger.LogWarning(
-                "Failed to delete transaction {TransactionId}. Status code: {StatusCode}. Message: {Message}",
-                id,
-                response.StatusCode,
-                message);
-            throw new ApiClientException(message);
-        }
+        var response = await SendDeleteRequestAsync(id);
 
-        logger.LogInformation(
-            "Deleted transaction {TransactionId} through transactions API",
-            id);
+        await EnsureSuccessStatusCodeAsync(
+            response,
+            $"Failed to delete transaction {id}.");
+
+        LogTransactionDeleted(id);
 
         return response.IsSuccessStatusCode;
     }
-}
 
-public record Transaction(Guid Id, decimal Amount, TransactionType Type, DateOnly Date, string? Description);
-public enum TransactionType
-{
-    Debit = 1,
-    Credit = 2
+    private static string BuildTransactionsUrl(
+        DateOnly? start,
+        DateOnly? end)
+    {
+        var url = "/transactions";
+
+        var query = CreateTransactionsQuery(start, end);
+
+        return query.Count > 0
+            ? QueryHelpers.AddQueryString(url, query)
+            : url;
+    }
+
+    private static Dictionary<string, string?> CreateTransactionsQuery(
+        DateOnly? start,
+        DateOnly? end)
+    {
+        var query = new Dictionary<string, string?>();
+
+        AddStartDateQuery(query, start);
+
+        AddEndDateQuery(query, end);
+
+        return query;
+    }
+
+    private static void AddStartDateQuery(
+        IDictionary<string, string?> query,
+        DateOnly? start)
+    {
+        if (start.HasValue)
+        {
+            query["start"] = start.Value.ToString("yyyy-MM-dd");
+        }
+    }
+
+    private static void AddEndDateQuery(
+        IDictionary<string, string?> query,
+        DateOnly? end)
+    {
+        if (end.HasValue)
+        {
+            query["end"] = end.Value.ToString("yyyy-MM-dd");
+        }
+    }
+
+    private async Task<TransactionModel[]> GetTransactionsFromApiAsync(string url)
+    {
+        return await httpClient.GetFromJsonAsync<TransactionModel[]>(url) ?? [];
+    }
+
+    private void LogTransactionsRetrieved(int transactionCount)
+    {
+        logger.LogInformation(
+            "Retrieved {TransactionCount} transactions from transactions API",
+            transactionCount);
+    }
+
+    private async Task<HttpResponseMessage> SendCreateRequestAsync(TransactionModel input)
+    {
+        return await httpClient.PostAsJsonAsync(
+            "/transactions",
+            input);
+    }
+
+    private async Task<HttpResponseMessage> SendUpdateRequestAsync(
+        Guid id,
+        TransactionModel input)
+    {
+        return await httpClient.PutAsJsonAsync(
+            $"/transactions/{id}",
+            input);
+    }
+
+    private async Task<HttpResponseMessage> SendDeleteRequestAsync(Guid id)
+    {
+        return await httpClient.DeleteAsync($"/transactions/{id}");
+    }
+
+    private async Task EnsureSuccessStatusCodeAsync(
+        HttpResponseMessage response,
+        string errorMessage)
+    {
+        if (response.IsSuccessStatusCode)
+        {
+            return;
+        }
+
+        var message = await ApiErrorReader.ReadMessageAsync(response);
+
+        LogApiFailure(
+            response,
+            errorMessage,
+            message);
+
+        throw new ApiClientException(message);
+    }
+
+    private void LogApiFailure(
+        HttpResponseMessage response,
+        string errorMessage,
+        string message)
+    {
+        logger.LogWarning(
+            "{ErrorMessage} Status code: {StatusCode}. Message: {Message}",
+            errorMessage,
+            response.StatusCode,
+            message);
+    }
+
+    private async Task<TransactionModel> ReadTransactionAsync(
+        HttpResponseMessage response)
+    {
+        return await response.Content.ReadFromJsonAsync<TransactionModel>()
+            ?? throw new ApiClientException(
+                "The transactions API returned an empty response.");
+    }
+
+    private void LogTransactionCreated(Guid transactionId)
+    {
+        logger.LogInformation(
+            "Created transaction {TransactionId} through transactions API",
+            transactionId);
+    }
+
+    private void LogTransactionUpdated(Guid transactionId)
+    {
+        logger.LogInformation(
+            "Updated transaction {TransactionId} through transactions API",
+            transactionId);
+    }
+
+    private void LogTransactionDeleted(Guid transactionId)
+    {
+        logger.LogInformation(
+            "Deleted transaction {TransactionId} through transactions API",
+            transactionId);
+    }
 }

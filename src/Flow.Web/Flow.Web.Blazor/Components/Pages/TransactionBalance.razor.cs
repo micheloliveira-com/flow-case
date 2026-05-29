@@ -1,5 +1,6 @@
 using Microsoft.AspNetCore.Components;
 using Flow.Web.Blazor.Clients;
+using Flow.Web.Blazor.Models;
 
 namespace Flow.Web.Blazor.Components.Pages;
 
@@ -8,7 +9,7 @@ public partial class TransactionBalance
     [Inject]
     private TransactionBalanceApiClient TransactionBalanceApi { get; set; } = default!;
 
-    private List<TransactionDailyBalance> dailyBalances = [];
+    private List<TransactionDailyBalanceModel> dailyBalances = [];
     private bool isLoading = true;
     private string? errorMessage;
 

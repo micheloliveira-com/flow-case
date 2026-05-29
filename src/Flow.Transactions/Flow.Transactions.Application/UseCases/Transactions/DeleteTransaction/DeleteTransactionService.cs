@@ -35,7 +35,18 @@ public sealed class DeleteTransactionService(
 
     private async Task DeleteAsync(Transaction transaction)
     {
+        RemoveTransaction(transaction);
+
+        await SaveChangesAsync();
+    }
+
+    private void RemoveTransaction(Transaction transaction)
+    {
         repository.Remove(transaction);
+    }
+
+    private async Task SaveChangesAsync()
+    {
         await repository.SaveChangesAsync();
     }
 
@@ -43,9 +54,31 @@ public sealed class DeleteTransactionService(
         Guid transactionId,
         DateOnly date)
     {
-        await publisher.PublishAsync(
-            new TransactionDailyRecomputeMessage(date));
+        var message = CreateDailyRecomputeMessage(date);
 
+        await PublishMessageAsync(message);
+
+        LogDailyRecomputePublished(
+            transactionId,
+            date);
+    }
+
+    private static TransactionDailyRecomputeMessage CreateDailyRecomputeMessage(
+        DateOnly date)
+    {
+        return new TransactionDailyRecomputeMessage(date);
+    }
+
+    private async Task PublishMessageAsync(
+        TransactionDailyRecomputeMessage message)
+    {
+        await publisher.PublishAsync(message);
+    }
+
+    private void LogDailyRecomputePublished(
+        Guid transactionId,
+        DateOnly date)
+    {
         logger.LogInformation(
             "Published daily recompute request for transaction {TransactionId} on {Date}",
             transactionId,
