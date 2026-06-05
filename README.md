@@ -62,7 +62,7 @@ Todas as classes, interfaces e contratos foram organizados conforme suas respons
 
 Projetos dedicados exclusivamente a contratos de Application / Infrastructure e camadas correlatas não foram criados, com o objetivo de reduzir complexidade e evitar fragmentação excessiva da solução. Em contrapartida, foi mantido o projeto Shared, utilizado para compartilhamento controlado de contratos e DTOs comuns entre os microsserviços, estritamente necessário para evitar repetição.
 
-Embora o projeto siga princípios de Clean Code e boas práticas arquiteturais, nem todos os refinamentos possíveis foram aplicados de forma exaustiva. Algumas decisões priorizaram simplicidade, legibilidade, adequação ao escopo do case e tempo de implementação.
+Embora o projeto siga princípios de Clean Code e boas práticas arquiteturais, nem todos os refinamentos possíveis foram aplicados de forma exaustiva. Algumas decisões priorizaram simplicidade, legibilidade, adequação ao escopo do case.
 
 O frontend Blazor foi incluído como interface operacional para demonstrar e validar os fluxos ponta a ponta. O foco principal de arquitetura, separação de responsabilidades e testes automatizados esteve nos contextos `Transactions`, `Reports`, mensageria, persistência, autenticação e observabilidade. Por isso, a UI pode conter limitações ou bugs de experiência que não invalidam o desenho arquitetural central do case.
 
