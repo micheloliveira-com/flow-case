@@ -2,6 +2,7 @@ name: SonarQube
 
 permissions:
   contents: read
+
 on:
   push:
     branches:
@@ -9,6 +10,7 @@ on:
       - develop
   pull_request:
     types: [opened, synchronize, reopened]
+
 env:
   SOLUTION_DIR: 'src'
 
@@ -16,6 +18,7 @@ jobs:
   build:
     name: Build and analyze
     runs-on: ubuntu-latest
+
     steps:
       - name: Set up JDK 17
         uses: actions/setup-java@v4
@@ -23,12 +26,13 @@ jobs:
           java-version: 17
           distribution: 'zulu'
 
-      - name: Install .NET 10
+      - name: Setup .NET 10
         uses: actions/setup-dotnet@v4
         with:
           dotnet-version: '10.0.x'
 
-      - uses: actions/checkout@v4
+      - name: Checkout
+        uses: actions/checkout@v4
         with:
           fetch-depth: 0
 
@@ -42,8 +46,7 @@ jobs:
       - name: Install SonarScanner
         run: |
           dotnet tool install --global dotnet-sonarscanner
-          dotnet tool install --global coverlet.console
-          echo "$HOME/.dotnet/tools" >> $GITHUB_PATH
+          echo "$HOME/.dotnet/tools" >> "$GITHUB_PATH"
 
       - name: Build and analyze
         env:
@@ -57,41 +60,28 @@ jobs:
             /d:sonar.token="${SONAR_TOKEN}" \
             /d:sonar.host.url="https://sonarcloud.io" \
             /d:sonar.exclusions="**/*.Blazor/**" \
-            /d:sonar.cs.opencover.reportsPaths="**/coverage.xml"
-          
-          dotnet build
-          
-          # Find first folder ending with .Tests (case-insensitive)
-          # Find all folders ending with .Tests (case-insensitive)
-          test_project_dirs=$(find . -type d -iname '*.tests')
+            /d:sonar.cs.opencover.reportsPaths="**/TestResults/**/coverage.opencover.xml"
 
-          if [ -z "$test_project_dirs" ]; then
-            echo "No test project folders found!"
+          dotnet build
+
+          test_projects=$(find . -type f -iname '*.Tests.csproj')
+
+          if [ -z "$test_projects" ]; then
+            echo "No test projects found!"
             exit 1
           fi
 
-          while IFS= read -r test_project_dir; do
-            echo "Found test project folder: $test_project_dir"
+          while IFS= read -r test_project; do
+            echo "Running tests for: $test_project"
 
-            project_name=$(basename "$test_project_dir")
+            test_project_dir=$(dirname "$test_project")
 
-            dll_path=$(find "$test_project_dir/bin" -type f -name "${project_name}.dll" | head -n 1)
+            dotnet test "$test_project" \
+              --no-build \
+              --collect:"XPlat Code Coverage" \
+              --results-directory "$test_project_dir/TestResults" \
+              -- DataCollectionRunSettings.DataCollectors.DataCollector.Configuration.Format=opencover
+          done <<< "$test_projects"
 
-            if [ -z "$dll_path" ]; then
-              echo "No DLL named $project_name.dll found inside $test_project_dir/bin!"
-              exit 1
-            fi
-
-            echo "Found test DLL: $dll_path"
-
-            coverage_file="$test_project_dir/coverage.xml"
-
-            coverlet "$dll_path" \
-                --target "dotnet" \
-                --targetargs "test --no-build" \
-                -f=opencover \
-                -o="$coverage_file"
-
-          done <<< "$test_project_dirs"
-              
-          dotnet-sonarscanner end /d:sonar.token="${SONAR_TOKEN}"
+          dotnet-sonarscanner end \
+            /d:sonar.token="${SONAR_TOKEN}"
