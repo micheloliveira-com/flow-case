@@ -12,11 +12,9 @@ Este projeto é de autoria de [micheloliveira-com](https://github.com/micheloliv
 
 O projeto possui pipeline de Continuous Integration (CI) via GitHub Actions, responsável por executar build, testes automatizados e análise estática com SonarCloud a cada alteração submetida ao repositório.
 
-[SonarCloud](https://sonarcloud.io/dashboard?id=micheloliveira-com_flow-case)
-
-[![SonarQube Status](https://img.shields.io/github/actions/workflow/status/micheloliveira-com/flow-case/sonarqube.yml?branch=main)](https://github.com/micheloliveira-com/flow-case/actions/workflows/sonarqube.yml)
-
 [![Quality gate](https://sonarcloud.io/api/project_badges/quality_gate?project=micheloliveira-com_flow-case)](https://sonarcloud.io/summary/new_code?id=micheloliveira-com_flow-case)
+
+[![GitHub commit activity](https://img.shields.io/github/commit-activity/t/micheloliveira-com/flow-case)](https://github.com/micheloliveira-com/flow-case/commits) [![SonarQube Status](https://img.shields.io/github/actions/workflow/status/micheloliveira-com/flow-case/sonarqube.yml?branch=main)](https://github.com/micheloliveira-com/flow-case/actions/workflows/sonarqube.yml)
 
 [![SonarQube Cloud](https://sonarcloud.io/images/project_badges/sonarcloud-dark.svg)](https://sonarcloud.io/summary/new_code?id=micheloliveira-com_flow-case)
 
@@ -34,6 +32,12 @@ O projeto possui pipeline de Continuous Integration (CI) via GitHub Actions, res
 
 > Nota: A análise e a cobertura de testes deste projeto contemplam exclusivamente as camadas `Application`, `Domain`, `Infrastructure` e `Shared` de cada microsserviço, validadas por meio de testes unitários.
 > Testes de integração e/ou end-to-end não foram realizados e, portanto, suas respectivas camadas foram excluídas da análise e não foram consideradas nas métricas de qualidade.
+
+## Wiki
+
+Para documentação adicional, detalhes sobre a arquitetura e exploração do repositório, consulte a wiki do projeto no DeepWiki.
+
+[![Ask DeepWiki](https://img.shields.io/badge/docs-DeepWiki-4c8bf5?style=for-the-badge)](https://deepwiki.com/micheloliveira-com/flow-case)
 
 ## Objetivos atendidos
 
